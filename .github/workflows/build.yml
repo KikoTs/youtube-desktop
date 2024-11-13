@@ -1,4 +1,4 @@
-name: Build YouTube Music
+name: Build YouTube
 
 on:
   push:
@@ -10,7 +10,7 @@ env:
 
 jobs:
   build:
-    name: Build YouTube Music
+    name: Build YouTube
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
@@ -87,7 +87,7 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
-    name: Release YouTube Music
+    name: Release YouTube
     if: github.repository == 'th-ch/youtube-music' && github.ref == 'refs/heads/master'
     needs: build
     steps:

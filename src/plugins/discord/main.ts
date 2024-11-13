@@ -170,7 +170,7 @@ export const backend = createBackend<
     if (config.playOnYouTubeMusic) {
       buttons.push({
         label: 'Play on YouTube Music',
-        url: songInfo.url ?? 'https://music.youtube.com',
+        url: songInfo.url ?? 'https://youtube.com',
       });
     }
     if (!config.hideGitHubButton) {
@@ -265,8 +265,8 @@ export const backend = createBackend<
       });
       connect();
     });
-    ctx.ipc.on('ytmd:player-api-loaded', () =>
-      ctx.ipc.send('ytmd:setup-time-changed-listener'),
+    ctx.ipc.on('ytd:player-api-loaded', () =>
+      ctx.ipc.send('ytd:setup-time-changed-listener'),
     );
     app.on('window-all-closed', clear);
   },

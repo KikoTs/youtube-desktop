@@ -167,18 +167,18 @@ function onClosed() {
   mainWindow = null;
 }
 
-ipcMain.handle('ytmd:get-main-plugin-names', () => Object.keys(mainPlugins));
+ipcMain.handle('ytd:get-main-plugin-names', () => Object.keys(mainPlugins));
 
 const initHook = (win: BrowserWindow) => {
   ipcMain.handle(
-    'ytmd:get-config',
+    'ytd:get-config',
     (_, id: string) =>
       deepmerge(
         allPlugins[id].config ?? { enabled: false },
         config.get(`plugins.${id}`) ?? {},
       ) as PluginConfig,
   );
-  ipcMain.handle('ytmd:set-config', (_, name: string, obj: object) =>
+  ipcMain.handle('ytd:set-config', (_, name: string, obj: object) =>
     config.setPartial(`plugins.${name}`, obj, allPlugins[name].config),
   );
 
@@ -487,7 +487,7 @@ async function createMainWindow() {
       event.preventDefault();
 
       win.webContents.loadURL(
-        'https://accounts.google.com/ServiceLogin?ltmpl=music&service=youtube&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26next%3Dhttps%253A%252F%252Fmusic.youtube.com%252F',
+        'https://accounts.google.com/ServiceLogin?ltmpl=music&service=youtube&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26next%3Dhttps%253A%252F%252Fyoutube.com%252F',
       );
     }
   });
@@ -645,7 +645,7 @@ app.whenReady().then(async () => {
         'Windows',
         'Start Menu',
         'Programs',
-        'YouTube Music.lnk',
+        'YouTube.lnk',
       );
       try {
         // Check if shortcut is registered and valid
@@ -665,7 +665,7 @@ app.whenReady().then(async () => {
           {
             target: appLocation,
             cwd: path.dirname(appLocation),
-            description: 'YouTube Music Desktop App - including custom plugins',
+            description: 'YouTube Desktop App - including custom plugins',
             appUserModelId: appID,
           },
         );

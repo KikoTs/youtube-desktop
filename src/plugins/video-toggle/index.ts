@@ -305,7 +305,7 @@ export default createPlugin({
           setVideoState(target.checked);
         });
 
-        video?.addEventListener('ytmd:src-changed', videoStarted);
+        video?.addEventListener('ytd:src-changed', videoStarted);
 
         observeThumbnail();
 

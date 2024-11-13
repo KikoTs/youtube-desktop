@@ -69,8 +69,8 @@ class YTPlayer extends MprisPlayer {
 
 function setupMPRIS() {
   const instance = new YTPlayer({
-    name: 'YoutubeMusic',
-    identity: 'YouTube Music',
+    name: 'Youtube',
+    identity: 'YouTube',
     supportedMimeTypes: ['audio/mpeg'],
     supportedInterfaces: ['player'],
   });
@@ -79,7 +79,7 @@ function setupMPRIS() {
   instance.canQuit = false;
   instance.canSetFullscreen = true;
   instance.supportedUriSchemes = ['http', 'https'];
-  instance.desktopEntry = 'youtube-music';
+  instance.desktopEntry = 'youtube-desktop';
   return instance;
 }
 
@@ -112,32 +112,32 @@ function registerMPRIS(win: BrowserWindow) {
         currentSongInfo?.videoId &&
         event.trackId.endsWith(correctId(currentSongInfo.videoId))
       ) {
-        win.webContents.send('ytmd:seek-to', microToSec(event.position ?? 0));
+        win.webContents.send('ytd:seek-to', microToSec(event.position ?? 0));
         player.setPosition(event.position ?? 0);
       }
     };
     const seekBy = (offset: number) => {
-      win.webContents.send('ytmd:seek-by', microToSec(offset));
+      win.webContents.send('ytd:seek-by', microToSec(offset));
       player.setPosition(player.getPosition() + offset);
     };
 
-    ipcMain.on('ytmd:player-api-loaded', () => {
-      win.webContents.send('ytmd:setup-seeked-listener', 'mpris');
-      win.webContents.send('ytmd:setup-time-changed-listener', 'mpris');
-      win.webContents.send('ytmd:setup-repeat-changed-listener', 'mpris');
-      win.webContents.send('ytmd:setup-volume-changed-listener', 'mpris');
-      win.webContents.send('ytmd:setup-fullscreen-changed-listener', 'mpris');
-      win.webContents.send('ytmd:setup-autoplay-changed-listener', 'mpris');
+    ipcMain.on('ytd:player-api-loaded', () => {
+      win.webContents.send('ytd:setup-seeked-listener', 'mpris');
+      win.webContents.send('ytd:setup-time-changed-listener', 'mpris');
+      win.webContents.send('ytd:setup-repeat-changed-listener', 'mpris');
+      win.webContents.send('ytd:setup-volume-changed-listener', 'mpris');
+      win.webContents.send('ytd:setup-fullscreen-changed-listener', 'mpris');
+      win.webContents.send('ytd:setup-autoplay-changed-listener', 'mpris');
       requestFullscreenInformation();
       requestQueueInformation();
     });
 
-    ipcMain.on('ytmd:seeked', (_, t: number) => {
+    ipcMain.on('ytd:seeked', (_, t: number) => {
       player.setPosition(secToMicro(t));
       player.seeked(secToMicro(t));
     });
 
-    ipcMain.on('ytmd:repeat-changed', (_, mode: RepeatMode) => {
+    ipcMain.on('ytd:repeat-changed', (_, mode: RepeatMode) => {
       switch (mode) {
         case 'NONE': {
           player.setLoopStatus(LOOP_STATUS_NONE);
@@ -156,7 +156,7 @@ function registerMPRIS(win: BrowserWindow) {
       requestQueueInformation();
     });
 
-    ipcMain.on('ytmd:fullscreen-changed', (_, changedTo: boolean) => {
+    ipcMain.on('ytd:fullscreen-changed', (_, changedTo: boolean) => {
       if (player.fullscreen === undefined || !player.canSetFullscreen) {
         return;
       }
@@ -166,7 +166,7 @@ function registerMPRIS(win: BrowserWindow) {
     });
 
     ipcMain.on(
-      'ytmd:set-fullscreen',
+      'ytd:set-fullscreen',
       (_, isFullscreen: boolean | undefined) => {
         if (!player.canSetFullscreen || isFullscreen === undefined) {
           return;
@@ -177,16 +177,16 @@ function registerMPRIS(win: BrowserWindow) {
     );
 
     ipcMain.on(
-      'ytmd:fullscreen-changed-supported',
+      'ytd:fullscreen-changed-supported',
       (_, isFullscreenSupported: boolean) => {
         player.canSetFullscreen = isFullscreenSupported;
       },
     );
-    ipcMain.on('ytmd:autoplay-changed', (_) => {
+    ipcMain.on('ytd:autoplay-changed', (_) => {
       requestQueueInformation();
     });
 
-    ipcMain.on('ytmd:get-queue-response', (_, queue: QueueResponse) => {
+    ipcMain.on('ytd:get-queue-response', (_, queue: QueueResponse) => {
       if (!queue) {
         return;
       }
@@ -290,7 +290,7 @@ function registerMPRIS(win: BrowserWindow) {
 
     let mprisVolNewer = false;
     let autoUpdate = false;
-    ipcMain.on('ytmd:volume-changed', (_, newVol) => {
+    ipcMain.on('ytd:volume-changed', (_, newVol) => {
       if (~~(player.volume * 100) !== newVol) {
         if (mprisVolNewer) {
           mprisVolNewer = false;

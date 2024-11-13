@@ -1,8 +1,8 @@
 {
-  "name": "youtube-music",
-  "productName": "YouTube Music",
+  "name": "youtube-desktop",
+  "productName": "YouTube",
   "version": "3.6.2",
-  "description": "YouTube Music Desktop App - including custom plugins",
+  "description": "YouTube Desktop App - including custom plugins",
   "main": "./dist/main/index.js",
   "license": "MIT",
   "repository": "th-ch/youtube-music",
@@ -13,7 +13,7 @@
   },
   "build": {
     "appId": "com.github.th-ch.youtube-music",
-    "productName": "YouTube Music",
+    "productName": "YouTube",
     "files": [
       "!*",
       "dist",
@@ -126,11 +126,11 @@
       ]
     },
     "appImage": {
-      "description": "YouTube Music Desktop App bundled with custom plugins (and built-in ad blocker / downloader)",
+      "description": "YouTube Desktop App bundled with custom plugins (and built-in ad blocker / downloader)",
       "category": "AudioVideo"
     },
     "flatpak": {
-      "description": "YouTube Music Desktop App bundled with custom plugins (and built-in ad blocker / downloader)",
+      "description": "YouTube Desktop App bundled with custom plugins (and built-in ad blocker / downloader)",
       "category": "AudioVideo"
     },
     "deb": {

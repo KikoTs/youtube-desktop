@@ -9,7 +9,7 @@ process.env.NODE_ENV = 'test';
 
 const appPath = path.resolve(__dirname, '..');
 
-test('YouTube Music App - With default settings, app is launched and visible', async () => {
+test('YouTube App - With default settings, app is launched and visible', async () => {
   const app = await electron.launch({
     cwd: appPath,
     args: [
@@ -31,10 +31,10 @@ test('YouTube Music App - With default settings, app is launched and visible', a
   }
 
   const title = await window.title();
-  expect(title.replaceAll(/\s/g, ' ')).toEqual('YouTube Music');
+  expect(title.replaceAll(/\s/g, ' ')).toEqual('YouTube');
 
   const url = window.url();
-  expect(url.startsWith('https://music.youtube.com')).toBe(true);
+  expect(url.startsWith('https://youtube.com')).toBe(true);
 
   await app.close();
 });

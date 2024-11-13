@@ -53,29 +53,29 @@ async function onApiLoaded() {
       window.dispatchEvent(new Event('resize')),
     );
 
-  window.ipcRenderer.on('ytmd:previous-video', () => {
+  window.ipcRenderer.on('ytd:previous-video', () => {
     document
       .querySelector<HTMLElement>('.previous-button.ytmusic-player-bar')
       ?.click();
   });
-  window.ipcRenderer.on('ytmd:next-video', () => {
+  window.ipcRenderer.on('ytd:next-video', () => {
     document
       .querySelector<HTMLElement>('.next-button.ytmusic-player-bar')
       ?.click();
   });
-  window.ipcRenderer.on('ytmd:play', (_) => {
+  window.ipcRenderer.on('ytd:play', (_) => {
     api?.playVideo();
   });
-  window.ipcRenderer.on('ytmd:pause', (_) => {
+  window.ipcRenderer.on('ytd:pause', (_) => {
     api?.pauseVideo();
   });
-  window.ipcRenderer.on('ytmd:toggle-play', (_) => {
+  window.ipcRenderer.on('ytd:toggle-play', (_) => {
     if (api?.getPlayerState() === 2) api?.playVideo();
     else api?.pauseVideo();
   });
-  window.ipcRenderer.on('ytmd:seek-to', (_, t: number) => api!.seekTo(t));
-  window.ipcRenderer.on('ytmd:seek-by', (_, t: number) => api!.seekBy(t));
-  window.ipcRenderer.on('ytmd:shuffle', () => {
+  window.ipcRenderer.on('ytd:seek-to', (_, t: number) => api!.seekTo(t));
+  window.ipcRenderer.on('ytd:seek-by', (_, t: number) => api!.seekBy(t));
+  window.ipcRenderer.on('ytd:shuffle', () => {
     document
       .querySelector<
         HTMLElement & { queue: { shuffle: () => void } }
@@ -83,7 +83,7 @@ async function onApiLoaded() {
       ?.queue.shuffle();
   });
   window.ipcRenderer.on(
-    'ytmd:update-like',
+    'ytd:update-like',
     (_, status: 'LIKE' | 'DISLIKE' = 'LIKE') => {
       document
         .querySelector<
@@ -92,7 +92,7 @@ async function onApiLoaded() {
         ?.updateLikeStatus(status);
     },
   );
-  window.ipcRenderer.on('ytmd:switch-repeat', (_, repeat = 1) => {
+  window.ipcRenderer.on('ytd:switch-repeat', (_, repeat = 1) => {
     for (let i = 0; i < repeat; i++) {
       document
         .querySelector<
@@ -101,7 +101,7 @@ async function onApiLoaded() {
         ?.onRepeatButtonClick();
     }
   });
-  window.ipcRenderer.on('ytmd:update-volume', (_, volume: number) => {
+  window.ipcRenderer.on('ytd:update-volume', (_, volume: number) => {
     document
       .querySelector<
         HTMLElement & { updateVolume: (volume: number) => void }
@@ -131,18 +131,18 @@ async function onApiLoaded() {
     }
   };
 
-  window.ipcRenderer.on('ytmd:get-fullscreen', () => {
-    window.ipcRenderer.send('ytmd:set-fullscreen', isFullscreen());
+  window.ipcRenderer.on('ytd:get-fullscreen', () => {
+    window.ipcRenderer.send('ytd:set-fullscreen', isFullscreen());
   });
 
   window.ipcRenderer.on(
-    'ytmd:click-fullscreen-button',
+    'ytd:click-fullscreen-button',
     (_, fullscreen: boolean | undefined) => {
       clickFullscreenButton(fullscreen ?? false);
     },
   );
 
-  window.ipcRenderer.on('ytmd:toggle-mute', (_) => {
+  window.ipcRenderer.on('ytd:toggle-mute', (_) => {
     document
       .querySelector<
         HTMLElement & { onVolumeTap: () => void }
@@ -150,9 +150,9 @@ async function onApiLoaded() {
       ?.onVolumeTap();
   });
 
-  window.ipcRenderer.on('ytmd:get-queue', () => {
+  window.ipcRenderer.on('ytd:get-queue', () => {
     const queue = document.querySelector<QueueElement>('#queue');
-    window.ipcRenderer.send('ytmd:get-queue-response', {
+    window.ipcRenderer.send('ytd:get-queue-response', {
       items: queue?.queue.getItems(),
       autoPlaying: queue?.queue.autoPlaying,
       continuation: queue?.queue.continuation,
@@ -182,7 +182,7 @@ async function onApiLoaded() {
 
   const audioCanPlayEventDispatcher = () => {
     document.dispatchEvent(
-      new CustomEvent('ytmd:audio-can-play', {
+      new CustomEvent('ytd:audio-can-play', {
         detail: {
           audioContext,
           audioSource,
@@ -204,7 +204,7 @@ async function onApiLoaded() {
 
   video.addEventListener('loadstart', loadstartListener, { passive: true });
 
-  window.ipcRenderer.send('ytmd:player-api-loaded');
+  window.ipcRenderer.send('ytd:player-api-loaded');
 
   // Navigate to "Starting page"
   const startingPage: string = window.mainConfig.get('options.startingPage');
@@ -253,7 +253,7 @@ async function onApiLoaded() {
 }
 
 /**
- * YouTube Music still using ES5, so we need to define custom elements using ES5 style
+ * YouTube still using ES5, so we need to define custom elements using ES5 style
  */
 const defineYTMDTransElements = () => {
   const YTMDTrans = function () {};
@@ -271,7 +271,7 @@ const defineYTMDTransElements = () => {
     }
   };
   customElements.define(
-    'ytmd-trans',
+    'ytd-trans',
     YTMDTrans as unknown as CustomElementConstructor,
   );
 };

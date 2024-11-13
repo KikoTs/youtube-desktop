@@ -143,16 +143,16 @@ const handleData = async (
     songInfo.imageSrc = thumbnails.at(-1)?.url.split('?')[0];
     if (songInfo.imageSrc) songInfo.image = await getImage(songInfo.imageSrc);
 
-    win.webContents.send('ytmd:update-song-info', songInfo);
+    win.webContents.send('ytd:update-song-info', songInfo);
   }
 
   return songInfo;
 };
 
 export enum SongInfoEvent {
-  VideoSrcChanged = 'ytmd:video-src-changed',
-  PlayOrPaused = 'ytmd:play-or-paused',
-  TimeChanged = 'ytmd:time-changed',
+  VideoSrcChanged = 'ytd:video-src-changed',
+  PlayOrPaused = 'ytd:play-or-paused',
+  TimeChanged = 'ytd:time-changed',
 }
 
 // This variable will be filled with the callbacks once they register
@@ -172,7 +172,7 @@ const registerProvider = (win: BrowserWindow) => {
   let songInfo: SongInfo | null = null;
 
   // This will be called when the song-info-front finds a new request with song data
-  ipcMain.on('ytmd:video-src-changed', async (_, data: GetPlayerResponse) => {
+  ipcMain.on('ytd:video-src-changed', async (_, data: GetPlayerResponse) => {
     const tempSongInfo = await dataMutex.runExclusive<SongInfo | null>(
       async () => {
         songInfo = await handleData(data, win);
@@ -187,7 +187,7 @@ const registerProvider = (win: BrowserWindow) => {
     }
   });
   ipcMain.on(
-    'ytmd:play-or-paused',
+    'ytd:play-or-paused',
     async (
       _,
       {
@@ -214,7 +214,7 @@ const registerProvider = (win: BrowserWindow) => {
     },
   );
 
-  ipcMain.on('ytmd:time-changed', async (_, seconds: number) => {
+  ipcMain.on('ytd:time-changed', async (_, seconds: number) => {
     const tempSongInfo = await dataMutex.runExclusive<SongInfo | null>(() => {
       if (!songInfo) {
         return null;

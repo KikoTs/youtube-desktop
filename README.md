@@ -1,6 +1,6 @@
 <div align="center">
 
-# YouTube Music
+# YouTube
 
 [![GitHub release](https://img.shields.io/github/release/th-ch/youtube-music.svg?style=for-the-badge&logo=youtube-music)](https://github.com/th-ch/youtube-music/releases/)
 [![GitHub license](https://img.shields.io/github/license/th-ch/youtube-music.svg?style=for-the-badge)](https://github.com/th-ch/youtube-music/blob/master/LICENSE)
@@ -17,16 +17,16 @@
 
 <div align="center">
 	<a href="https://github.com/th-ch/youtube-music/releases/latest">
-		<img src="web/youtube-music.svg" width="400" height="100" alt="YouTube Music SVG">
+		<img src="web/youtube-music.svg" width="400" height="100" alt="YouTube SVG">
 	</a>
 </div>
 
 Read this in other languages: [🇰🇷](./docs/readme/README-ko.md), [🇮🇸](./docs/readme/README-is.md), [🇨🇱 🇪🇸](./docs/readme/README-es.md), [🇷🇺](./docs/readme/README-ru.md)
 
-**Electron wrapper around YouTube Music featuring:**
+**Electron wrapper around YouTube featuring:**
 
 - Native look & feel, aims at keeping the original interface
-- Framework for custom plugins: change YouTube Music to your needs (style, content, features), enable/disable plugins in
+- Framework for custom plugins: change YouTube to your needs (style, content, features), enable/disable plugins in
   one click
 
 ## Demo Image

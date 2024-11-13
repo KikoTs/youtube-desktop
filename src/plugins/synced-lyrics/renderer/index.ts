@@ -73,7 +73,7 @@ export const renderer = createRenderer<
   async start(ctx: RendererContext<SyncedLyricsPluginConfig>) {
     setConfig(await ctx.getConfig());
 
-    ctx.ipc.on('ytmd:update-song-info', async (info: SongInfo) => {
+    ctx.ipc.on('ytd:update-song-info', async (info: SongInfo) => {
       await makeLyricsRequest(info);
     });
   },

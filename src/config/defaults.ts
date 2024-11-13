@@ -48,7 +48,7 @@ const defaultConfig: DefaultConfig = {
     x: -1,
     y: -1,
   },
-  'url': 'https://music.youtube.com',
+  'url': 'https://youtube.com',
   'options': {
     tray: false,
     appVisible: true,

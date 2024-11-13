@@ -27,53 +27,53 @@ const parseBooleanFromArgsType = (args: ArgsType<boolean>) => {
 export default (win: BrowserWindow) => {
   return {
     // Playback
-    previous: () => win.webContents.send('ytmd:previous-video'),
-    next: () => win.webContents.send('ytmd:next-video'),
-    play: () => win.webContents.send('ytmd:play'),
-    pause: () => win.webContents.send('ytmd:pause'),
-    playPause: () => win.webContents.send('ytmd:toggle-play'),
-    like: () => win.webContents.send('ytmd:update-like', 'LIKE'),
-    dislike: () => win.webContents.send('ytmd:update-like', 'DISLIKE'),
+    previous: () => win.webContents.send('ytd:previous-video'),
+    next: () => win.webContents.send('ytd:next-video'),
+    play: () => win.webContents.send('ytd:play'),
+    pause: () => win.webContents.send('ytd:pause'),
+    playPause: () => win.webContents.send('ytd:toggle-play'),
+    like: () => win.webContents.send('ytd:update-like', 'LIKE'),
+    dislike: () => win.webContents.send('ytd:update-like', 'DISLIKE'),
     goBack: (seconds: ArgsType<number>) => {
       const secondsNumber = parseNumberFromArgsType(seconds);
       if (secondsNumber !== null) {
-        win.webContents.send('ytmd:seek-by', -secondsNumber);
+        win.webContents.send('ytd:seek-by', -secondsNumber);
       }
     },
     goForward: (seconds: ArgsType<number>) => {
       const secondsNumber = parseNumberFromArgsType(seconds);
       if (secondsNumber !== null) {
-        win.webContents.send('ytmd:seek-by', seconds);
+        win.webContents.send('ytd:seek-by', seconds);
       }
     },
-    shuffle: () => win.webContents.send('ytmd:shuffle'),
+    shuffle: () => win.webContents.send('ytd:shuffle'),
     switchRepeat: (n: ArgsType<number> = 1) => {
       const repeat = parseNumberFromArgsType(n);
       if (repeat !== null) {
-        win.webContents.send('ytmd:switch-repeat', n);
+        win.webContents.send('ytd:switch-repeat', n);
       }
     },
     // General
     setVolume: (volume: ArgsType<number>) => {
       const volumeNumber = parseNumberFromArgsType(volume);
       if (volumeNumber !== null) {
-        win.webContents.send('ytmd:update-volume', volume);
+        win.webContents.send('ytd:update-volume', volume);
       }
     },
     setFullscreen: (isFullscreen: ArgsType<boolean>) => {
       const isFullscreenValue = parseBooleanFromArgsType(isFullscreen);
       if (isFullscreenValue !== null) {
         win.setFullScreen(isFullscreenValue);
-        win.webContents.send('ytmd:click-fullscreen-button', isFullscreenValue);
+        win.webContents.send('ytd:click-fullscreen-button', isFullscreenValue);
       }
     },
     requestFullscreenInformation: () => {
-      win.webContents.send('ytmd:get-fullscreen');
+      win.webContents.send('ytd:get-fullscreen');
     },
     requestQueueInformation: () => {
-      win.webContents.send('ytmd:get-queue');
+      win.webContents.send('ytd:get-queue');
     },
-    muteUnmute: () => win.webContents.send('ytmd:toggle-mute'),
+    muteUnmute: () => win.webContents.send('ytd:toggle-mute'),
     search: () => {
       win.webContents.sendInputEvent({
         type: 'keyDown',

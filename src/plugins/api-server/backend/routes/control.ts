@@ -396,7 +396,7 @@ export const register = (
   app.openapi(routes.getFullscreenState, async (ctx) => {
     const stateResponsePromise = new Promise<boolean>((resolve) => {
       ipcMain.once(
-        'ytmd:set-fullscreen',
+        'ytd:set-fullscreen',
         (_, isFullscreen: boolean | undefined) => {
           return resolve(!!isFullscreen);
         },
@@ -412,7 +412,7 @@ export const register = (
   });
   app.openapi(routes.queueInfo, async (ctx) => {
     const queueResponsePromise = new Promise<QueueResponse>((resolve) => {
-      ipcMain.once('ytmd:get-queue-response', (_, queue: QueueResponse) => {
+      ipcMain.once('ytd:get-queue-response', (_, queue: QueueResponse) => {
         return resolve(queue);
       });
 

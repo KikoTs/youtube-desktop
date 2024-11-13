@@ -3,10 +3,19 @@
  */
 
 /* Allow window dragging */
-ytmusic-nav-bar {
+ytd-nav-bar {
   position: relative;
 }
-ytmusic-nav-bar::before {
+/* ytd-masthead{
+  margin-top: 32px;
+}
+ytd-mini-guide-renderer{
+  margin-top: 32px;
+}
+ytd-browse{
+  margin-top: 32px;
+} */
+ytd-nav-bar::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -15,26 +24,26 @@ ytmusic-nav-bar::before {
   -webkit-app-region: drag;
 }
 
-ytmusic-nav-bar > .left-content > *,
-ytmusic-nav-bar > .center-content > *,
-ytmusic-nav-bar > .right-content > * {
+ytd-nav-bar > .left-content > *,
+ytd-nav-bar > .center-content > *,
+ytd-nav-bar > .right-content > * {
   -webkit-app-region: no-drag;
 }
 
 iron-icon,
-ytmusic-pivot-bar-item-renderer,
+ytd-pivot-bar-item-renderer,
 .tab-title,
 a {
   -webkit-app-region: no-drag;
 }
 
 /* custom style for navbar */
-ytmusic-app-layout {
+ytd-app-layout {
   --ytmusic-nav-bar-height: 90px;
 }
 
 /* Blocking annoying elements */
-ytmusic-mealbar-promo-renderer {
+ytd-mealbar-promo-renderer {
   display: none !important;
 }
 
@@ -45,7 +54,7 @@ img {
 }
 
 /* Hide cast button which doesn't work */
-ytmusic-cast-button {
+ytd-cast-button {
   display: none !important;
 }
 

@@ -91,7 +91,7 @@ const sendError = (error: Error, source?: string) => {
 export const getCookieFromWindow = async (win: BrowserWindow) => {
   return (
     await win.webContents.session.cookies.get({
-      url: 'https://music.youtube.com',
+      url: 'https://youtube.com',
     })
   )
     .map((it) => it.name + '=' + it.value)
@@ -115,7 +115,7 @@ export const onMainLoad = async ({
     fetch: getNetFetchAsFetch(),
   });
   ipc.handle('download-song', (url: string) => downloadSong(url));
-  ipc.on('ytmd:video-src-changed', (data: GetPlayerResponse) => {
+  ipc.on('ytd:video-src-changed', (data: GetPlayerResponse) => {
     playingUrl = data.microformat.microformatDataRenderer.urlCanonical;
   });
   ipc.handle('download-playlist-request', async (url: string) =>
@@ -221,8 +221,8 @@ function downloadSongOnFinishSetup({
     }
   });
 
-  ipcMain.on('ytmd:player-api-loaded', () => {
-    ipc.send('ytmd:setup-time-changed-listener');
+  ipcMain.on('ytd:player-api-loaded', () => {
+    ipc.send('ytd:setup-time-changed-listener');
   });
 }
 

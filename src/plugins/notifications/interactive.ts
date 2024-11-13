@@ -259,7 +259,7 @@ export default (
   songControls = getSongControls(win);
 
   let currentSeconds = 0;
-  on('ytmd:player-api-loaded', () => send('ytmd:setup-time-changed-listener'));
+  on('ytd:player-api-loaded', () => send('ytd:setup-time-changed-listener'));
 
   let savedSongInfo: SongInfo;
   let lastUrl: string | undefined;

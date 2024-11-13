@@ -910,7 +910,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - Add dynamic synced plugin config provider [`#1064`](https://github.com/th-ch/youtube-music/pull/1064)
 - [captions-selector] fix button showing when there aren't any captions available [`#1063`](https://github.com/th-ch/youtube-music/pull/1063)
 - [in-app-menu] fix items hidden by navbar in library [`#1067`](https://github.com/th-ch/youtube-music/pull/1067)
-- Fix Youtube Music logo is draggable [`#1061`](https://github.com/th-ch/youtube-music/pull/1061)
+- Fix Youtube logo is draggable [`#1061`](https://github.com/th-ch/youtube-music/pull/1061)
 - fix build action failing on forks, and run it on pull requests [`#1069`](https://github.com/th-ch/youtube-music/pull/1069)
 - try to fix songInfo time&album [`#1032`](https://github.com/th-ch/youtube-music/pull/1032)
 - [lyrics] Romanization toggle for Genius plugin [`#1039`](https://github.com/th-ch/youtube-music/pull/1039)

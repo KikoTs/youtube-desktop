@@ -292,8 +292,8 @@ export const TitleBar = (props: TitleBarProps) => {
       if (
         e.target instanceof HTMLElement &&
         !(
-          e.target.closest('nav[data-ytmd-main-panel]') ||
-          e.target.closest('ul[data-ytmd-sub-panel]')
+          e.target.closest('nav[data-ytd-main-panel]') ||
+          e.target.closest('ul[data-ytd-sub-panel]')
         )
       ) {
         setOpenTarget(null);
@@ -325,7 +325,7 @@ export const TitleBar = (props: TitleBarProps) => {
 
   return (
     <nav
-      data-ytmd-main-panel={true}
+      data-ytd-main-panel={true}
       class={titleStyle()}
       data-macos={props.isMacOS}
       data-show={mouseY() < 32}

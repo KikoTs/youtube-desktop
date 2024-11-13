@@ -23,7 +23,7 @@ export const backend = createBackend<BackendType, APIServerConfig>({
       this.songInfo = songInfo;
     });
 
-    ctx.ipc.on('ytmd:player-api-loaded', () => ctx.ipc.send('ytmd:setup-time-changed-listener'));
+    ctx.ipc.on('ytd:player-api-loaded', () => ctx.ipc.send('ytd:setup-time-changed-listener'));
 
     this.run(config.hostname, config.port);
   },
@@ -92,7 +92,7 @@ export const backend = createBackend<BackendType, APIServerConfig>({
       openapi: '3.1.0',
       info: {
         version: '1.0.0',
-        title: 'Youtube Music API Server',
+        title: 'Youtube API Server',
       },
       security: [
         {

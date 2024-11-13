@@ -7,12 +7,12 @@ import config from '@/config';
 export const restart = () => restartInternal();
 
 export const setupAppControls = () => {
-  ipcMain.on('ytmd:restart', restart);
-  ipcMain.handle('ytmd:get-downloads-folder', () => app.getPath('downloads'));
-  ipcMain.on('ytmd:reload', () =>
+  ipcMain.on('ytd:restart', restart);
+  ipcMain.handle('ytd:get-downloads-folder', () => app.getPath('downloads'));
+  ipcMain.on('ytd:reload', () =>
     BrowserWindow.getFocusedWindow()?.webContents.loadURL(config.get('url')),
   );
-  ipcMain.handle('ytmd:get-path', (_, ...args: string[]) => path.join(...args));
+  ipcMain.handle('ytd:get-path', (_, ...args: string[]) => path.join(...args));
 };
 
 function restartInternal() {

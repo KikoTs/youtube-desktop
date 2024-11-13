@@ -3,6 +3,15 @@
   --menu-bar-height: 32px;
 }
 
+ytd-masthead, ytd-mini-guide-renderer, ytd-app, tp-yt-app-drawer{
+  overflow: scroll;
+  /* height: calc(100vh - var(--menu-bar-height, 36px)); */
+  margin-top: var(--menu-bar-height, 36px) !important;
+}
+
+ytd-feed-filter-chip-bar-renderer:not([not-sticky]) #chips-wrapper {
+  margin-top: var(--menu-bar-height, 36px) !important;
+}
 /* youtube-music style */
 ytmusic-app-layout {
   overflow: scroll;
