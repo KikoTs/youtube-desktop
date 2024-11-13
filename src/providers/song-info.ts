@@ -82,18 +82,21 @@ const handleData = async (
     playlistId: '',
     mediaType: MediaType.Audio,
   } satisfies SongInfo;
+  const microformat = data.microformat?.playerMicroformatRenderer;
 
-  const microformat = data.microformat?.microformatDataRenderer;
   if (microformat) {
+    const videoId = microformat.embed.iframeUrl.split('/embed/')[1];
+    const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
     songInfo.uploadDate = microformat.uploadDate;
-    songInfo.url = microformat.urlCanonical?.split('&')[0];
+    songInfo.url = videoUrl
     songInfo.playlistId =
-      new URL(microformat.urlCanonical).searchParams.get('list') ?? '';
+      new URL(videoUrl).searchParams.get('list') ?? '';
     // Used for options.resumeOnStart
-    config.set('url', microformat.urlCanonical);
+    config.set('url', videoUrl);
   }
 
   const { videoDetails } = data;
+  console.log(JSON.stringify(data));
   if (videoDetails) {
     songInfo.title = cleanupName(videoDetails.title);
     songInfo.artist = cleanupName(videoDetails.author);
@@ -119,7 +122,7 @@ const handleData = async (
         // HACK: Podcast's participant is not the artist
         if (!config.get('options.usePodcastParticipantAsArtist')) {
           songInfo.artist = cleanupName(
-            data.microformat.microformatDataRenderer.pageOwnerDetails.name,
+            data.microformat.playerMicroformatRenderer.pageOwnerDetails.name,
           );
         }
         break;
@@ -133,7 +136,7 @@ const handleData = async (
             ?.params?.find((it) => it.key === 'ipcc')?.value ?? '1') != '0'
         ) {
           songInfo.artist = cleanupName(
-            data.microformat.microformatDataRenderer.pageOwnerDetails.name,
+            data.microformat.playerMicroformatRenderer.pageOwnerDetails.name,
           );
         }
         break;
@@ -195,6 +198,7 @@ const registerProvider = (win: BrowserWindow) => {
         elapsedSeconds,
       }: { isPaused: boolean; elapsedSeconds: number },
     ) => {
+      console.log('ytd:play-or-paused', isPaused, elapsedSeconds);
       const tempSongInfo = await dataMutex.runExclusive<SongInfo | null>(() => {
         if (!songInfo) {
           return null;
