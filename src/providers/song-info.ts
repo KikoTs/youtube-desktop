@@ -43,6 +43,22 @@ export interface SongInfo {
   mediaType: MediaType;
 }
 
+export interface VideoInfo {
+  title: string;
+  channel: string;
+  views: number;
+  uploadDate?: string;
+  imageSrc?: string | null;
+  image?: Electron.NativeImage | null;
+  isPaused?: boolean;
+  videoDuration: number;
+  elapsedSeconds?: number;
+  url?: string;
+  videoId: string;
+  playlistId?: string;
+  mediaType: MediaType;
+}
+
 // Grab the native image using the src
 export const getImage = async (src: string): Promise<Electron.NativeImage> => {
   const result = await net.fetch(src);
@@ -82,6 +98,23 @@ const handleData = async (
     playlistId: '',
     mediaType: MediaType.Audio,
   } satisfies SongInfo;
+
+  const videoInfo: VideoInfo = {
+    title: '',
+    channel: '',
+    views: 0,
+    uploadDate: '',
+    imageSrc: '',
+    image: null,
+    isPaused: undefined,
+    videoDuration: 0,
+    elapsedSeconds: 0,
+    url: '',
+    videoId: '',
+    playlistId: '',
+    mediaType: MediaType.Audio,
+  }
+
   const microformat = data.microformat?.playerMicroformatRenderer;
 
   if (microformat) {

@@ -157,7 +157,7 @@ export interface HeartbeatParams {
 }
 
 export interface Microformat {
-  playerMicroformatRenderer: MicroformatDataRenderer;
+  playerMicroformatRenderer: MicroformatDataRenderer; // okay
 }
 
 export interface MicroformatDataRenderer {
@@ -180,20 +180,20 @@ export interface MicroformatDataRenderer {
   liveBroadcastDetails?: LiveBroadcastDetails; // okay
 }
 export interface VideoEmbed {
-  iframeUrl: string;
-  width: number;
-  height: number;
+  iframeUrl: string; // okay
+  width: number; // okay
+  height: number; // okay
 }
 export interface VideoTitle {
-  simpleText: string;
+  simpleText: string; // okay 
 }
 export interface VideoDescription {
-  simpleText: string;
+  simpleText: string; // okay
 }
 export interface LiveBroadcastDetails {
-  isLiveNow: boolean;
-  startTimestamp: string;
-  endTimestamp?: string;
+  isLiveNow: boolean; // okay
+  startTimestamp: string; // okay 
+  endTimestamp?: string; // okay
 }
 export interface LinkAlternate {
   hrefUrl: string;
