@@ -278,6 +278,33 @@ const showNeedToRestartDialog = (id: string) => {
 
 function initTheme(win: BrowserWindow) {
   injectCSS(win.webContents, youtubeCSS);
+    // Mac-specific CSS
+  if (is.macOS()) {
+    const macStyles = `
+      :root {
+        --titlebar-background-color: var(--ytmusic-color-black3);
+        --menu-bar-height: 8px;
+      }
+      ytd-video-preview {
+        margin-top: calc(-1 * var(--menu-bar-height, 10px)) !important;
+      }
+      ytd-masthead, ytd-mini-guide-renderer, ytd-app, tp-yt-app-drawer {
+        overflow: scroll;
+        margin-top: var(--menu-bar-height, 10px) !important;
+      }
+      
+      ytd-feed-filter-chip-bar-renderer:not([not-sticky]) #chips-wrapper {
+        margin-top: var(--menu-bar-height, 10px) !important;
+      }
+      
+      ytmusic-app-layout {
+        overflow: scroll;
+        height: calc(100vh - var(--menu-bar-height, 10px));
+        margin-top: var(--menu-bar-height, 10px) !important;
+      }
+    `;
+    injectCSS(win.webContents, macStyles);
+  }
   // Load user CSS
   const themes: string[] = config.get('options.themes');
   if (Array.isArray(themes)) {
