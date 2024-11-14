@@ -303,7 +303,16 @@ function initTheme(win: BrowserWindow) {
         margin-top: var(--menu-bar-height, 10px) !important;
       }
     `;
+    const titleBarHackMac =
+    'var div = document.createElement("div");' +
+    'div.style.position = "absolute";' +
+    'div.style.top = 0;' +
+    'div.style.height = "26px";' +
+    'div.style.width = "100%";' +
+    'div.style["-webkit-app-region"] = "drag";' +
+    'document.body.appendChild(div);';
     injectCSS(win.webContents, macStyles);
+    win.webContents.executeJavaScript(titleBarHackMac)
   }
   // Load user CSS
   const themes: string[] = config.get('options.themes');
