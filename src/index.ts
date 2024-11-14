@@ -283,31 +283,33 @@ function initTheme(win: BrowserWindow) {
     const macStyles = `
       :root {
         --titlebar-background-color: var(--ytmusic-color-black3);
-        --menu-bar-height: 8px;
+        --menu-bar-height: 32px;
       }
       ytd-video-preview {
-        margin-top: calc(-1 * var(--menu-bar-height, 10px)) !important;
+        margin-top: calc(-1 * var(--menu-bar-height, 36px)) !important;
       }
       ytd-masthead, ytd-mini-guide-renderer, ytd-app, tp-yt-app-drawer {
         overflow: scroll;
-        margin-top: var(--menu-bar-height, 10px) !important;
+        margin-top: var(--menu-bar-height, 36px) !important;
       }
       
       ytd-feed-filter-chip-bar-renderer:not([not-sticky]) #chips-wrapper {
-        margin-top: var(--menu-bar-height, 10px) !important;
+        margin-top: var(--menu-bar-height, 36px) !important;
       }
       
       ytmusic-app-layout {
         overflow: scroll;
-        height: calc(100vh - var(--menu-bar-height, 10px));
-        margin-top: var(--menu-bar-height, 10px) !important;
+        height: calc(100vh - var(--menu-bar-height, 36px));
+        margin-top: var(--menu-bar-height, 36px) !important;
       }
     `;
     const titleBarHackMac =
     'var div = document.createElement("div");' +
-    'div.style.position = "absolute";' +
+    'div.style.position = "fixed";' +
     'div.style.top = 0;' +
-    'div.style.height = "26px";' +
+    'div.style.zIndex = 10000000;' +
+    'div.style.background = "#0f0f0f";' +
+    'div.style.height = "34px";' +
     'div.style.width = "100%";' +
     'div.style["-webkit-app-region"] = "drag";' +
     'document.body.appendChild(div);';
