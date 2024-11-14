@@ -2,7 +2,9 @@
   --titlebar-background-color: var(--ytmusic-color-black3);
   --menu-bar-height: 32px;
 }
-
+ytd-video-preview {
+  margin-top: calc(-1 * var(--menu-bar-height, 36px)) !important;
+}
 ytd-masthead, ytd-mini-guide-renderer, ytd-app, tp-yt-app-drawer{
   overflow: scroll;
   /* height: calc(100vh - var(--menu-bar-height, 36px)); */

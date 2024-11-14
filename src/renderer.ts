@@ -21,7 +21,7 @@ import {
 import type { PluginConfig } from '@/types/plugins';
 import type { YoutubePlayer } from '@/types/youtube-player';
 import type { QueueElement } from '@/types/queue';
-import type { QueueResponse } from '@/types/youtube-music-desktop-internal';
+import type { QueueResponse } from '@/types/youtube-desktop-internal';
 
 let api: (Element & YoutubePlayer) | null = null;
 let isPluginLoaded = false;
@@ -41,7 +41,7 @@ async function listenForApiLoad() {
   }
 }
 
-interface YouTubeMusicAppElement extends HTMLElement {
+interface YouTubeAppElement extends HTMLElement {
   navigate(page: string): void;
 }
 
@@ -210,7 +210,7 @@ async function onApiLoaded() {
   const startingPage: string = window.mainConfig.get('options.startingPage');
   if (startingPage && startingPages[startingPage]) {
     document
-      .querySelector<YouTubeMusicAppElement>('ytmusic-app')
+      .querySelector<YouTubeAppElement>('ytmusic-app')
       ?.navigate(startingPages[startingPage]);
   }
 

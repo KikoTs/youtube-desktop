@@ -3,7 +3,7 @@
 import { VideoDetails } from './video-details';
 import { GetPlayerResponse } from './get-player-response';
 import { PlayerAPIEvents } from './player-api-events';
-import { WatchNextResponse } from '@/types/youtube-music-desktop-internal';
+import { WatchNextResponse } from '@/types/youtube-desktop-internal';
 
 export interface YoutubePlayer {
   getInternalApiInterface: <Parameters extends unknown[], Return>(

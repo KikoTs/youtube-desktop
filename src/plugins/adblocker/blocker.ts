@@ -78,3 +78,4 @@ export const unloadAdBlockerEngine = (session: Electron.Session) => {
 
 export const isBlockerEnabled = (session: Electron.Session) =>
   blocker !== undefined && blocker.isBlockingEnabled(session);
+

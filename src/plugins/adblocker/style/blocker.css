@@ -1,0 +1,42 @@
+/* Remove ads and unwanted elements on YouTube */
+
+/* Main banner and masthead ads */
+#masthead-ad,
+#panels > [target-id="engagement-panel-ads"],
+#main > #banner.ytd-merch-shelf-renderer,
+.masthead-ad > .ytd-rich-grid-renderer {
+    display: none !important;
+}
+
+/* Ad slot renderers */
+ytd-ad-slot-renderer,
+ytd-rich-item-renderer:has(ytd-display-ad-renderer),
+ytd-rich-item-renderer:has(> .ytd-rich-item-renderer > ytd-ad-slot-renderer),
+ytd-ad-slot-renderer.style-scope.ytd-item-section-renderer,
+#items > ytd-ad-slot-renderer,
+#content > ytd-ad-slot-renderer,
+#related > div#player-ads,
+#scroll-container > #items.ytd-merch-shelf-renderer {
+    display: none !important;
+}
+
+/* Suggested actions, badges, and teasers */
+.ytp-suggested-action > button.ytp-suggested-action-badge,
+#ytd-player button.ytp-suggested-action-badge,
+.ytp-chrome-top-buttons > .ytp-cards-teaser {
+    display: none !important;
+}
+
+/* Shorts and search-related ads */
+#shorts-inner-container > .ytd-shorts:has(> .ytd-reel-video-renderer > ytd-ad-slot-renderer),
+#contents.style-scope.ytd-search-pyv-renderer,
+ytd-search-pyv-renderer {
+    display: none !important;
+}
+
+/* Mobile YouTube ads */
+m.youtube.com #lazy-list > ad-slot-renderer,
+m.youtube.com #ytm-companion-slot[data-content-type] > ytm-companion-ad-renderer,
+m.youtube.com #ytm-rich-item-renderer > ad-slot-renderer {
+    display: none !important;
+}

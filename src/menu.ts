@@ -437,7 +437,7 @@ export const mainMenuTemplate = async (
               ),
               type: 'normal',
               click() {
-                const url = 'https://hosted.weblate.org/engage/youtube-music/';
+                const url = 'https://hosted.weblate.org/engage/youtube/';
                 shell.openExternal(url);
               },
             } as Electron.MenuItemConstructorOptions,

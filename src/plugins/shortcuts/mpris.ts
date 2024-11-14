@@ -23,7 +23,7 @@ import config from '@/config';
 import { LoggerPrefix } from '@/utils';
 
 import type { RepeatMode } from '@/types/datahost-get-state';
-import type { QueueResponse } from '@/types/youtube-music-desktop-internal';
+import type { QueueResponse } from '@/types/youtube-desktop-internal';
 
 class YTPlayer extends MprisPlayer {
   /**

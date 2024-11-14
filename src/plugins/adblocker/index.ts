@@ -11,7 +11,7 @@ import {
 import injectCliqzPreload from './injectors/inject-cliqz-preload';
 import { inject, isInjected } from './injectors/inject';
 import { loadAdSpeedup } from './adSpeedup';
-
+import blockerStyle from './style/blocker.css?inline';
 import { t } from '@/i18n';
 
 import type { BrowserWindow } from 'electron';
@@ -137,6 +137,7 @@ export default createPlugin({
       if (config.blocker === blockers.WithBlocklists) {
         // Preload adblocker to inject scripts/styles
         await injectCliqzPreload();
+        webFrame.insertCSS(blockerStyle);
       } else if (config.blocker === blockers.InPlayer && !isInjected()) {
         inject(contextBridge);
         await webFrame.executeJavaScript(this.script);

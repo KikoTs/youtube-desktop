@@ -5,7 +5,7 @@ import getVideoControls from '@/providers/video-controls';
 import registerCallback, { VideoInfoEvent } from '@/providers/video-info';
 import { t } from '@/i18n';
 
-import youtubeMusicIcon from '@assets/youtube-music.png?asset&asarUnpack';
+import youtubeIcon from '@assets/youtube.png?asset&asarUnpack';
 
 export default createPlugin({
   name: () => t('plugins.touchbar.name'),
@@ -95,7 +95,7 @@ export default createPlugin({
         videoImage.icon = (
           videoInfo.image
             ? videoInfo.image
-            : nativeImage.createFromPath(youtubeMusicIcon)
+            : nativeImage.createFromPath(youtubeIcon)
         ).resize({ height: 23 });
 
         window.setTouchBar(touchBar);

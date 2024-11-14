@@ -43,7 +43,7 @@ import {
   setupProtocolHandler,
 } from '@/providers/protocol-handler';
 
-import youtubeMusicCSS from '@/youtube-music.css?inline';
+import youtubeCSS from '@/youtube.css?inline';
 
 import {
   forceLoadMainPlugin,
@@ -277,7 +277,7 @@ const showNeedToRestartDialog = (id: string) => {
 };
 
 function initTheme(win: BrowserWindow) {
-  injectCSS(win.webContents, youtubeMusicCSS);
+  injectCSS(win.webContents, youtubeCSS);
   // Load user CSS
   const themes: string[] = config.get('options.themes');
   if (Array.isArray(themes)) {
@@ -630,7 +630,7 @@ app.whenReady().then(async () => {
 
   // Register appID on windows
   if (is.windows()) {
-    const appID = 'com.github.th-ch.youtube-music';
+    const appID = 'com.github.kikots.youtube';
     app.setAppUserModelId(appID);
     const appLocation = process.execPath;
     const appData = app.getPath('appData');
@@ -774,7 +774,7 @@ app.whenReady().then(async () => {
     }, 2000);
     autoUpdater.on('update-available', () => {
       const downloadLink =
-        'https://github.com/th-ch/youtube-music/releases/latest';
+        'https://github.com/KikoTs/youtube/releases/latest';
       const dialogOptions: Electron.MessageBoxOptions = {
         type: 'info',
         buttons: [

@@ -3,7 +3,7 @@ import fs from 'node:fs';
 
 import { app, NativeImage } from 'electron';
 
-import youtubeMusicIcon from '@assets/youtube-music.png?asset&asarUnpack';
+import youtubeIcon from '@assets/youtube.png?asset&asarUnpack';
 
 import { VideoInfo } from '@/providers/video-info';
 
@@ -46,7 +46,7 @@ export const notificationImage = (
   config: NotificationsPluginConfig,
 ) => {
   if (!videoInfo.image) {
-    return youtubeMusicIcon;
+    return youtubeIcon;
   }
 
   if (!config.interactive) {
@@ -71,7 +71,7 @@ export const saveImage = (img: NativeImage, savePath: string) => {
   } catch (error: unknown) {
     console.error('Error writing video icon to disk:');
     console.trace(error);
-    return youtubeMusicIcon;
+    return youtubeIcon;
   }
 
   return savePath;

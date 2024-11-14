@@ -12,17 +12,17 @@ export type DiscordPluginConfig = {
    */
   autoReconnect: boolean;
   /**
-   * If enabled, the discord rich presence gets cleared when music paused after the time specified below
+   * If enabled, the discord rich presence gets cleared when video paused after the time specified below
    */
   activityTimeoutEnabled: boolean;
   /**
-   * The time in milliseconds after which the discord rich presence gets cleared when music paused
+   * The time in milliseconds after which the discord rich presence gets cleared when video paused
    *
    * @default 10 * 60 * 1000 (10 minutes)
    */
   activityTimeoutTime: number;
   /**
-   * Add a "Play on YouTube Music" button to rich presence
+   * Add a "Play on YouTube" button to rich presence
    */
   playOnYouTubeMusic: boolean;
   /**

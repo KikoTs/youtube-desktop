@@ -19,7 +19,7 @@ import type { VideoInfo } from '@/providers/video-info';
 import type { BackendContext } from '@/types/contexts';
 import type { APIServerConfig } from '../../config';
 import type { HonoApp } from '../types';
-import type { QueueResponse } from '@/types/youtube-music-desktop-internal';
+import type { QueueResponse } from '@/types/youtube-desktop-internal';
 
 const API_VERSION = 'v1';
 
