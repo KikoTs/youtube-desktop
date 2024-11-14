@@ -1,8 +1,8 @@
 import { Menu, nativeImage, screen, Tray } from 'electron';
 import is from 'electron-is';
 
-import defaultTrayIconAsset from '@assets/youtube-music-tray.png?asset&asarUnpack';
-import pausedTrayIconAsset from '@assets/youtube-music-tray-paused.png?asset&asarUnpack';
+import defaultTrayIconAsset from '@assets/youtube-tray.png?asset&asarUnpack';
+import pausedTrayIconAsset from '@assets/youtube-tray-paused.png?asset&asarUnpack';
 
 import config from './config';
 

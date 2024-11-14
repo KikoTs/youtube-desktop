@@ -154,7 +154,7 @@ electronDebug({
   showDevTools: false, // Disable automatic devTools on new window
 });
 
-let icon = 'assets/youtube-music.png';
+let icon = 'assets/YouTube.png';
 if (process.platform === 'win32') {
   icon = 'assets/generated/icon.ico';
 } else if (process.platform === 'darwin') {

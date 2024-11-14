@@ -12,7 +12,7 @@
     "url": "https://github.com/th-ch/youtube-music"
   },
   "build": {
-    "appId": "com.github.th-ch.youtube-music",
+    "appId": "com.github.kikots.youtube",
     "productName": "YouTube",
     "files": [
       "!*",
@@ -127,11 +127,11 @@
     },
     "appImage": {
       "description": "YouTube Desktop App bundled with custom plugins (and built-in ad blocker / downloader)",
-      "category": "AudioVideo"
+      "category": "Video"
     },
     "flatpak": {
       "description": "YouTube Desktop App bundled with custom plugins (and built-in ad blocker / downloader)",
-      "category": "AudioVideo"
+      "category": "Video"
     },
     "deb": {
       "depends": [
