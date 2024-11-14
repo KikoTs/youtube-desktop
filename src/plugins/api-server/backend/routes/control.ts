@@ -2,12 +2,12 @@ import { createRoute, z } from '@hono/zod-openapi';
 
 import { ipcMain } from 'electron';
 
-import getSongControls from '@/providers/song-controls';
+import getVideoControls from '@/providers/video-controls';
 
 import {
   AuthHeadersSchema,
-  type ResponseSongInfo,
-  SongInfoSchema,
+  type ResponseVideoInfo,
+  VideoInfoSchema,
   GoForwardScheme,
   GoBackSchema,
   SwitchRepeatSchema,
@@ -15,7 +15,7 @@ import {
   SetFullscreenSchema,
 } from '../scheme';
 
-import type { SongInfo } from '@/providers/song-info';
+import type { VideoInfo } from '@/providers/video-info';
 import type { BackendContext } from '@/types/contexts';
 import type { APIServerConfig } from '../../config';
 import type { HonoApp } from '../types';
@@ -27,8 +27,8 @@ const routes = {
   previous: createRoute({
     method: 'post',
     path: `/api/${API_VERSION}/previous`,
-    summary: 'play previous song',
-    description: 'Plays the previous song in the queue',
+    summary: 'play previous video',
+    description: 'Plays the previous video in the queue',
     responses: {
       204: {
         description: 'Success',
@@ -38,8 +38,8 @@ const routes = {
   next: createRoute({
     method: 'post',
     path: `/api/${API_VERSION}/next`,
-    summary: 'play next song',
-    description: 'Plays the next song in the queue',
+    summary: 'play next video',
+    description: 'Plays the next video in the queue',
     responses: {
       204: {
         description: 'Success',
@@ -83,8 +83,8 @@ const routes = {
   like: createRoute({
     method: 'post',
     path: `/api/${API_VERSION}/like`,
-    summary: 'like song',
-    description: 'Set the current song as liked',
+    summary: 'like video',
+    description: 'Set the current video as liked',
     responses: {
       204: {
         description: 'Success',
@@ -94,8 +94,8 @@ const routes = {
   dislike: createRoute({
     method: 'post',
     path: `/api/${API_VERSION}/dislike`,
-    summary: 'dislike song',
-    description: 'Set the current song as disliked',
+    summary: 'dislike video',
+    description: 'Set the current video as disliked',
     responses: {
       204: {
         description: 'Success',
@@ -107,7 +107,7 @@ const routes = {
     method: 'post',
     path: `/api/${API_VERSION}/go-back`,
     summary: 'go back',
-    description: 'Move the current song back by a number of seconds',
+    description: 'Move the current video back by a number of seconds',
     request: {
       headers: AuthHeadersSchema,
       body: {
@@ -130,7 +130,7 @@ const routes = {
     method: 'post',
     path: `/api/${API_VERSION}/go-forward`,
     summary: 'go forward',
-    description: 'Move the current song forward by a number of seconds',
+    description: 'Move the current video forward by a number of seconds',
     request: {
       headers: AuthHeadersSchema,
       body: {
@@ -275,22 +275,22 @@ const routes = {
       },
     },
   }),
-  songInfo: createRoute({
+  videoInfo: createRoute({
     method: 'get',
-    path: `/api/${API_VERSION}/song-info`,
-    summary: 'get current song info',
-    description: 'Get the current song info',
+    path: `/api/${API_VERSION}/video-info`,
+    summary: 'get current video info',
+    description: 'Get the current video info',
     responses: {
       200: {
         description: 'Success',
         content: {
           'application/json': {
-            schema: SongInfoSchema,
+            schema: VideoInfoSchema,
           },
         },
       },
       204: {
-        description: 'No song info',
+        description: 'No video info',
       },
     },
   }),
@@ -299,9 +299,9 @@ const routes = {
 export const register = (
   app: HonoApp,
   { window }: BackendContext<APIServerConfig>,
-  songInfoGetter: () => SongInfo | undefined,
+  videoInfoGetter: () => VideoInfo | undefined,
 ) => {
-  const controller = getSongControls(window);
+  const controller = getVideoControls(window);
 
   app.openapi(routes.previous, (ctx) => {
     controller.previous();
@@ -429,18 +429,18 @@ export const register = (
     ctx.status(200);
     return ctx.json(info);
   });
-  app.openapi(routes.songInfo, (ctx) => {
-    const info = songInfoGetter();
+  app.openapi(routes.videoInfo, (ctx) => {
+    const info = videoInfoGetter();
 
     if (!info) {
       ctx.status(204);
       return ctx.body(null);
     }
 
-    const body = { ...info };
+    const body = { ...info};
     delete body.image;
 
     ctx.status(200);
-    return ctx.json(body satisfies ResponseSongInfo);
+    return ctx.json(body satisfies ResponseVideoInfo);
   });
 };

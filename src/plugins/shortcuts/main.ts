@@ -3,7 +3,7 @@ import is from 'electron-is';
 import { register as registerElectronLocalShortcut } from 'electron-localshortcut';
 
 import registerMPRIS from './mpris';
-import getSongControls from '@/providers/song-controls';
+import getVideoControls from '@/providers/video-controls';
 
 import type { ShortcutMappingType, ShortcutsPluginConfig } from './index';
 
@@ -35,8 +35,8 @@ export const onMainLoad = async ({
 }: BackendContext<ShortcutsPluginConfig>) => {
   const config = await getConfig();
 
-  const songControls = getSongControls(window);
-  const { playPause, next, previous, search } = songControls;
+  const videoControls = getVideoControls(window);
+  const { playPause, next, previous, search } = videoControls;
 
   if (config.overrideMediaKeys) {
     _registerGlobalShortcut(window.webContents, 'MediaPlayPause', playPause);
@@ -76,7 +76,7 @@ export const onMainLoad = async ({
         ':',
         action,
       );
-      const actionCallback: () => void = songControls[action];
+      const actionCallback: () => void = videoControls[action];
       if (typeof actionCallback !== 'function') {
         console.warn('Invalid action', action);
         continue;

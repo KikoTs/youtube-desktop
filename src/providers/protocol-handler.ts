@@ -2,7 +2,7 @@ import path from 'node:path';
 
 import { app, BrowserWindow } from 'electron';
 
-import getSongControls from './song-controls';
+import getVideoControls from './video-controls';
 
 export const APP_PROTOCOL = 'youtubemusic';
 
@@ -19,14 +19,14 @@ export function setupProtocolHandler(win: BrowserWindow) {
     app.setAsDefaultProtocolClient(APP_PROTOCOL);
   }
 
-  const songControls = getSongControls(win);
+  const videoControls = getVideoControls(win);
 
   protocolHandler = ((
-    cmd: keyof typeof songControls,
+    cmd: keyof typeof videoControls,
     args: string[] | undefined = undefined,
   ) => {
-    if (Object.keys(songControls).includes(cmd)) {
-      songControls[cmd](args as never);
+    if (Object.keys(videoControls).includes(cmd)) {
+      videoControls[cmd](args as never);
     }
   }) as (cmd: string) => void;
 }

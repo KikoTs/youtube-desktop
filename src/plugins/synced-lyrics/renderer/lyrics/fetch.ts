@@ -5,7 +5,7 @@ import { config } from '../renderer';
 
 import { setDebugInfo, setLineLyrics } from '../components/LyricsContainer';
 
-import type { SongInfo } from '@/providers/song-info';
+import type { VideoInfo } from '@/providers/video-info';
 import type { LineLyrics, LRCLIBSearchResponse } from '../../types';
 
 export const [isInstrumental, setIsInstrumental] = createSignal(false);
@@ -39,23 +39,19 @@ export const extractTimeAndText = (
   };
 };
 
-export const makeLyricsRequest = async (extractedSongInfo: SongInfo) => {
+export const makeLyricsRequest = async (extractedVideoInfo: VideoInfo) => {
   setIsFetching(true);
   setLineLyrics([]);
 
-  const songData: Parameters<typeof getLyricsList>[0] = {
-    title: `${extractedSongInfo.title}`,
-    artist: `${extractedSongInfo.artist}`,
-    songDuration: extractedSongInfo.songDuration,
+  const videoData: Parameters<typeof getLyricsList>[0] = {
+    title: `${extractedVideoInfo.title}`,
+    author: `${extractedVideoInfo.author}`,
+    videoDuration: extractedVideoInfo.videoDuration,
   };
-
-  if (extractedSongInfo.album) {
-    songData.album = extractedSongInfo.album;
-  }
 
   let lyrics;
   try {
-    lyrics = await getLyricsList(songData);
+    lyrics = await getLyricsList(videoData);
   } catch {}
 
   setLineLyrics(lyrics ?? []);
@@ -63,7 +59,7 @@ export const makeLyricsRequest = async (extractedSongInfo: SongInfo) => {
 };
 
 export const getLyricsList = async (
-  songData: Pick<SongInfo, 'title' | 'artist' | 'album' | 'songDuration'>,
+  videoData: Pick<VideoInfo, 'title' | 'author' | 'videoDuration'>,
 ): Promise<LineLyrics[] | null> => {
   setIsInstrumental(false);
   setHadSecondAttempt(false);
@@ -71,13 +67,10 @@ export const getLyricsList = async (
   setDebugInfo('Searching for lyrics...');
 
   let query = new URLSearchParams({
-    artist_name: songData.artist,
-    track_name: songData.title,
+    artist_name: videoData.author,
+    track_name: videoData.title,
   });
 
-  if (songData.album) {
-    query.set('album_name', songData.album);
-  }
 
   let url = `https://lrclib.net/api/search?${query.toString()}`;
   let response = await fetch(url);
@@ -99,7 +92,7 @@ export const getLyricsList = async (
       return null;
     }
 
-    query = new URLSearchParams({ q: songData.title });
+    query = new URLSearchParams({ q: videoData.title });
     url = `https://lrclib.net/api/search?${query.toString()}`;
 
     response = await fetch(url);
@@ -119,10 +112,10 @@ export const getLyricsList = async (
 
   const filteredResults: LRCLIBSearchResponse = [];
   for (const item of data) {
-    const { artist } = songData;
+    const { author } = videoData;
     const { artistName } = item;
 
-    const artists = artist.split(/[&,]/g).map((i) => i.trim());
+    const artists = author.split(/[&,]/g).map((i) => i.trim());
     const itemArtists = artistName.split(/[&,]/g).map((i) => i.trim());
 
     const permutations = artists.flatMap((artistA) =>
@@ -136,7 +129,7 @@ export const getLyricsList = async (
     if (ratio > 0.9) filteredResults.push(item);
   }
 
-  const duration = songData.songDuration;
+  const duration = videoData.videoDuration;
   filteredResults.sort(({ duration: durationA }, { duration: durationB }) => {
     const left = Math.abs(durationA - duration);
     const right = Math.abs(durationB - duration);

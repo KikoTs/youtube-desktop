@@ -7,8 +7,8 @@ import pausedTrayIconAsset from '@assets/youtube-music-tray-paused.png?asset&asa
 import config from './config';
 
 import { restart } from './providers/app-controls';
-import registerCallback, { SongInfoEvent } from './providers/song-info';
-import getSongControls from './providers/song-controls';
+import registerCallback, { VideoInfoEvent } from './providers/video-info';
+import getVideoControls from './providers/video-controls';
 
 import { t } from '@/i18n';
 
@@ -47,7 +47,7 @@ export const setUpTray = (app: Electron.App, win: Electron.BrowserWindow) => {
     return;
   }
 
-  const { playPause, next, previous } = getSongControls(win);
+  const { playPause, next, previous } = getVideoControls(win);
 
   const pixelRatio = is.windows()
     ? screen.getPrimaryDisplay().scaleFactor || 1
@@ -125,23 +125,23 @@ export const setUpTray = (app: Electron.App, win: Electron.BrowserWindow) => {
   const trayMenu = Menu.buildFromTemplate(template);
   tray.setContextMenu(trayMenu);
 
-  registerCallback((songInfo, event) => {
-    if (event === SongInfoEvent.TimeChanged) return;
+  registerCallback((videoInfo, event) => {
+    if (event === VideoInfoEvent.TimeChanged) return;
 
     if (tray) {
-      if (typeof songInfo.isPaused === 'undefined') {
+      if (typeof videoInfo.isPaused === 'undefined') {
         tray.setImage(defaultTrayIcon);
         return;
       }
 
       tray.setToolTip(
         t('main.tray.tooltip.with-song-info', {
-          artist: songInfo.artist,
-          title: songInfo.title,
+          artist: videoInfo.author,
+          title: videoInfo.title,
         }),
       );
 
-      tray.setImage(songInfo.isPaused ? pausedTrayIcon : defaultTrayIcon);
+      tray.setImage(videoInfo.isPaused ? pausedTrayIcon : defaultTrayIcon);
     }
   });
 };

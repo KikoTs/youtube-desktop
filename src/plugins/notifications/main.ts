@@ -6,20 +6,20 @@ import { notificationImage } from './utils';
 import interactive from './interactive';
 
 import registerCallback, {
-  type SongInfo,
-  SongInfoEvent,
-} from '@/providers/song-info';
+  type VideoInfo,
+  VideoInfoEvent,
+} from '@/providers/video-info';
 
 import type { NotificationsPluginConfig } from './index';
 import type { BackendContext } from '@/types/contexts';
 
 let config: NotificationsPluginConfig;
 
-const notify = (info: SongInfo) => {
+const notify = (info: VideoInfo) => {
   // Send the notification
   const currentNotification = new Notification({
     title: info.title || 'Playing',
-    body: info.artist,
+    body: info.author,
     icon: notificationImage(info, config),
     silent: true,
     urgency: config.urgency,
@@ -33,18 +33,18 @@ const setup = () => {
   let oldNotification: Notification;
   let currentUrl: string | undefined;
 
-  registerCallback((songInfo: SongInfo, event) => {
+  registerCallback((videoInfo: VideoInfo, event) => {
     if (
-      event !== SongInfoEvent.TimeChanged &&
-      !songInfo.isPaused &&
-      (songInfo.url !== currentUrl || config.unpauseNotification)
+      event !== VideoInfoEvent.TimeChanged &&
+      !videoInfo.isPaused &&
+      (videoInfo.url !== currentUrl || config.unpauseNotification)
     ) {
       // Close the old notification
       oldNotification?.close();
-      currentUrl = songInfo.url;
+      currentUrl = videoInfo.url;
       // This fixes a weird bug that would cause the notification to be updated instead of showing
       setTimeout(() => {
-        oldNotification = notify(songInfo);
+        oldNotification = notify(videoInfo);
       }, 10);
     }
   });
@@ -55,7 +55,7 @@ export const onMainLoad = async (
 ) => {
   config = await context.getConfig();
 
-  // Register the callback for new song information
+  // Register the callback for new video information
   if (is.windows() && config.interactive)
     interactive(context.window, () => config, context);
   else setup();

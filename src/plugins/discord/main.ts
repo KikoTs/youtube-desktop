@@ -5,9 +5,9 @@ import { dev } from 'electron-is';
 import { ActivityType, GatewayActivityButton } from 'discord-api-types/v10';
 
 import registerCallback, {
-  type SongInfo,
-  SongInfoEvent,
-} from '@/providers/song-info';
+  type VideoInfo,
+  VideoInfoEvent,
+} from '@/providers/video-info';
 import { createBackend, LoggerPrefix } from '@/utils';
 import { t } from '@/i18n';
 
@@ -21,7 +21,7 @@ export interface Info {
   rpc: DiscordClient;
   ready: boolean;
   autoReconnect: boolean;
-  lastSongInfo?: SongInfo;
+  lastVideoInfo?: VideoInfo;
 }
 
 const info: Info = {
@@ -30,7 +30,7 @@ const info: Info = {
   }),
   ready: false,
   autoReconnect: true,
-  lastSongInfo: undefined,
+  lastVideoInfo: undefined,
 };
 
 /**
@@ -115,21 +115,21 @@ export const isConnected = () => info.rpc !== null;
 export const backend = createBackend<
   {
     config?: DiscordPluginConfig;
-    updateActivity: (songInfo: SongInfo, config: DiscordPluginConfig) => void;
+    updateActivity: (videoInfo: VideoInfo, config: DiscordPluginConfig) => void;
   },
   DiscordPluginConfig
 >({
   /**
    * We get multiple events
-   * Next song: PAUSE(n), PAUSE(n+1), PLAY(n+1)
+   * Next video: PAUSE(n), PAUSE(n+1), PLAY(n+1)
    * Skip time: PAUSE(N), PLAY(N)
    */
-  updateActivity: (songInfo, config) => {
-    if (songInfo.title.length === 0 && songInfo.artist.length === 0) {
+  updateActivity: (videoInfo, config) => {
+    if (videoInfo.title.length === 0 && videoInfo.author.length === 0) {
       return;
     }
 
-    info.lastSongInfo = songInfo;
+    info.lastVideoInfo = videoInfo;
 
     // Stop the clear activity timeout
     clearTimeout(clearActivity);
@@ -142,7 +142,7 @@ export const backend = createBackend<
 
     // Clear directly if timeout is 0
     if (
-      songInfo.isPaused &&
+      videoInfo.isPaused &&
       config.activityTimeoutEnabled &&
       config.activityTimeoutTime === 0
     ) {
@@ -150,18 +150,18 @@ export const backend = createBackend<
       return;
     }
 
-    // Song information changed, so lets update the rich presence
+    // Video information changed, so lets update the rich presence
     // @see https://discord.com/developers/docs/topics/gateway#activity-object
     // not all options are transfered through https://github.com/discordjs/RPC/blob/6f83d8d812c87cb7ae22064acd132600407d7d05/src/client.js#L518-530
     const hangulFillerUnicodeCharacter = '\u3164'; // This is an empty character
-    if (songInfo.title.length < 2) {
-      songInfo.title += hangulFillerUnicodeCharacter.repeat(
-        2 - songInfo.title.length,
+    if (videoInfo.title.length < 2) {
+      videoInfo.title += hangulFillerUnicodeCharacter.repeat(
+        2 - videoInfo.title.length,
       );
     }
-    if (songInfo.artist.length < 2) {
-      songInfo.artist += hangulFillerUnicodeCharacter.repeat(
-        2 - songInfo.title.length,
+    if (videoInfo.author.length < 2) {
+      videoInfo.author += hangulFillerUnicodeCharacter.repeat(
+        2 - videoInfo.title.length,
       );
     }
 
@@ -170,7 +170,7 @@ export const backend = createBackend<
     if (config.playOnYouTubeMusic) {
       buttons.push({
         label: 'Play on YouTube Music',
-        url: songInfo.url ?? 'https://youtube.com',
+        url: videoInfo.url ?? 'https://youtube.com',
       });
     }
     if (!config.hideGitHubButton) {
@@ -185,15 +185,15 @@ export const backend = createBackend<
 
     const activityInfo: SetActivity = {
       type: ActivityType.Listening,
-      details: songInfo.title,
-      state: songInfo.artist,
-      largeImageKey: songInfo.imageSrc ?? '',
-      largeImageText: songInfo.album ?? '',
+      details: videoInfo.title,
+      state: videoInfo.author,
+      largeImageKey: videoInfo.imageSrc ?? '',
+      largeImageText: videoInfo.author ?? '',
       buttons,
     };
 
-    if (songInfo.isPaused) {
-      // Add a paused icon to show that the song is paused
+    if (videoInfo.isPaused) {
+      // Add a paused icon to show that the video is paused
       activityInfo.smallImageKey = 'paused';
       activityInfo.smallImageText = 'Paused';
       // Set start the timer so the activity gets cleared after a while if enabled
@@ -204,10 +204,10 @@ export const backend = createBackend<
         );
       }
     } else if (!config.hideDurationLeft) {
-      // Add the start and end time of the song
-      const songStartTime = Date.now() - (songInfo.elapsedSeconds ?? 0) * 1000;
-      activityInfo.startTimestamp = songStartTime;
-      activityInfo.endTimestamp = songStartTime + songInfo.songDuration * 1000;
+      // Add the start and end time of the video
+      const videoStartTime = Date.now() - (videoInfo.elapsedSeconds ?? 0) * 1000;
+      activityInfo.startTimestamp = videoStartTime;
+      activityInfo.endTimestamp = videoStartTime + videoInfo.videoDuration * 1000;
     }
 
     info.rpc.user?.setActivity(activityInfo).catch(console.error);
@@ -227,8 +227,8 @@ export const backend = createBackend<
 
     info.rpc.on('ready', () => {
       info.ready = true;
-      if (info.lastSongInfo && this.config) {
-        this.updateActivity(info.lastSongInfo, this.config);
+      if (info.lastVideoInfo && this.config) {
+        this.updateActivity(info.lastVideoInfo, this.config);
       }
     });
 
@@ -247,18 +247,18 @@ export const backend = createBackend<
     // If the page is ready, register the callback
     ctx.window.once('ready-to-show', () => {
       let lastSent = Date.now();
-      registerCallback((songInfo, event) => {
-        if (event !== SongInfoEvent.TimeChanged) {
-          info.lastSongInfo = songInfo;
-          if (this.config) this.updateActivity(songInfo, this.config);
+      registerCallback((videoInfo, event) => {
+        if (event !== VideoInfoEvent.TimeChanged) {
+          info.lastVideoInfo = videoInfo;
+          if (this.config) this.updateActivity(videoInfo, this.config);
         } else {
           const currentTime = Date.now();
           // if lastSent is more than 5 seconds ago, send the new time
           if (currentTime - lastSent > 5000) {
             lastSent = currentTime;
-            if (songInfo) {
-              info.lastSongInfo = songInfo;
-              if (this.config) this.updateActivity(songInfo, this.config);
+            if (videoInfo) {
+              info.lastVideoInfo = videoInfo;
+              if (this.config) this.updateActivity(videoInfo, this.config);
             }
           }
         }
@@ -276,8 +276,8 @@ export const backend = createBackend<
   onConfigChange(newConfig) {
     this.config = newConfig;
     info.autoReconnect = newConfig.autoReconnect;
-    if (info.lastSongInfo) {
-      this.updateActivity(info.lastSongInfo, newConfig);
+    if (info.lastVideoInfo) {
+      this.updateActivity(info.lastVideoInfo, newConfig);
     }
   },
 });

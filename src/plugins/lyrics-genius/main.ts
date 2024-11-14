@@ -3,7 +3,7 @@ import is from 'electron-is';
 import { convert } from 'html-to-text';
 
 import { GetGeniusLyric } from './types';
-import { cleanupName, type SongInfo } from '@/providers/song-info';
+import { cleanupName, type VideoInfo } from '@/providers/video-info';
 
 import type { LyricsGeniusPluginConfig } from './index';
 
@@ -23,8 +23,8 @@ export const onMainLoad = async ({
     revRomanized = true;
   }
 
-  ipc.handle('search-genius-lyrics', async (extractedSongInfo: SongInfo) => {
-    const metadata = extractedSongInfo;
+  ipc.handle('search-genius-lyrics', async (extractedVideoInfo: VideoInfo) => {
+    const metadata = extractedVideoInfo;
     return await fetchFromGenius(metadata);
   });
 };
@@ -33,9 +33,9 @@ export const onConfigChange = (newConfig: LyricsGeniusPluginConfig) => {
   revRomanized = newConfig.romanizedLyrics;
 };
 
-export const fetchFromGenius = async (metadata: SongInfo) => {
-  const songTitle = `${cleanupName(metadata.title)}`;
-  const songArtist = `${cleanupName(metadata.artist)}`;
+export const fetchFromGenius = async (metadata: VideoInfo) => {
+  const videoTitle = `${cleanupName(metadata.title)}`;
+  const videoAuthor = `${cleanupName(metadata.author)}`;
   let lyrics: string | null;
 
   /* Uses Regex to test the title and artist first for said characters if romanization is enabled. Otherwise, normal
@@ -44,28 +44,28 @@ export const fetchFromGenius = async (metadata: SongInfo) => {
   let hasAsianChars = false;
   if (
     revRomanized &&
-    (eastAsianChars.test(songTitle) || eastAsianChars.test(songArtist))
+    (eastAsianChars.test(videoTitle) || eastAsianChars.test(videoAuthor))
   ) {
-    lyrics = await getLyricsList(`${songArtist} ${songTitle} Romanized`);
+    lyrics = await getLyricsList(`${videoAuthor} ${videoTitle} Romanized`);
     hasAsianChars = true;
   } else {
-    lyrics = await getLyricsList(`${songArtist} ${songTitle}`);
+    lyrics = await getLyricsList(`${videoAuthor} ${videoTitle}`);
   }
 
   /* If the romanization toggle is on, and we did not detect any characters in the title or artist, we do a check
   for characters in the lyrics themselves. If this check proves true, we search for Romanized lyrics.
   */
   if (revRomanized && !hasAsianChars && lyrics && eastAsianChars.test(lyrics)) {
-    lyrics = await getLyricsList(`${songArtist} ${songTitle} Romanized`);
+    lyrics = await getLyricsList(`${videoAuthor} ${videoTitle} Romanized`);
   }
 
   return lyrics;
 };
 
 /**
- * Fetches a JSON of songs which is then parsed and passed into getLyrics to get the lyrical content of the first song
+ * Fetches a JSON of videos which is then parsed and passed into getLyrics to get the lyrical content of the first song
  * @param {*} queryString
- * @returns The lyrics of the first song found using the Genius-Lyrics API
+ * @returns The lyrics of the first video found using the Genius-Lyrics API
  */
 const getLyricsList = async (queryString: string): Promise<string | null> => {
   const response = await net.fetch(

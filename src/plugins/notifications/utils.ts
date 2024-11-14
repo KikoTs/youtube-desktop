@@ -5,7 +5,7 @@ import { app, NativeImage } from 'electron';
 
 import youtubeMusicIcon from '@assets/youtube-music.png?asset&asarUnpack';
 
-import { SongInfo } from '@/providers/song-info';
+import { VideoInfo } from '@/providers/video-info';
 
 import type { NotificationsPluginConfig } from './index';
 
@@ -42,25 +42,25 @@ const nativeImageToLogo = (nativeImage: NativeImage) => {
 };
 
 export const notificationImage = (
-  songInfo: SongInfo,
+  videoInfo: VideoInfo,
   config: NotificationsPluginConfig,
 ) => {
-  if (!songInfo.image) {
+  if (!videoInfo.image) {
     return youtubeMusicIcon;
   }
 
   if (!config.interactive) {
-    return nativeImageToLogo(songInfo.image);
+    return nativeImageToLogo(videoInfo.image);
   }
 
   switch (config.toastStyle) {
     case ToastStyles.logo:
     case ToastStyles.legacy: {
-      return saveImage(nativeImageToLogo(songInfo.image), temporaryIcon);
+      return saveImage(nativeImageToLogo(videoInfo.image), temporaryIcon);
     }
 
     default: {
-      return saveImage(songInfo.image, temporaryBanner);
+      return saveImage(videoInfo.image, temporaryBanner);
     }
   }
 };
@@ -69,7 +69,7 @@ export const saveImage = (img: NativeImage, savePath: string) => {
   try {
     fs.writeFileSync(savePath, img.toPNG());
   } catch (error: unknown) {
-    console.error('Error writing song icon to disk:');
+    console.error('Error writing video icon to disk:');
     console.trace(error);
     return youtubeMusicIcon;
   }

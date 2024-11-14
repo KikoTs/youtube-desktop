@@ -51,7 +51,7 @@ declare module 'butterchurn' {
     setOutputAA(useAA: boolean): void;
     setCanvas(canvas: HTMLCanvasElement): void;
     render(opts?: VisualizerOptions): unknown;
-    launchSongTitleAnim(text: string): void;
+    launchVideoTitleAnim(text: string): void;
     toDataURL(): string;
     warpBufferToDataURL(): string;
   }

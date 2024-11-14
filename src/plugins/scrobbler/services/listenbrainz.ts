@@ -3,7 +3,7 @@ import { net } from 'electron';
 import { ScrobblerBase } from './base';
 
 import type { SetConfType } from '../main';
-import type { SongInfo } from '@/providers/song-info';
+import type { VideoInfo } from '@/providers/video-info';
 import type { ScrobblerPluginConfig } from '../index';
 
 interface ListenbrainzRequestBody {
@@ -37,7 +37,7 @@ export class ListenbrainzScrobbler extends ScrobblerBase {
   }
 
   override setNowPlaying(
-    songInfo: SongInfo,
+    videoInfo: VideoInfo,
     config: ScrobblerPluginConfig,
     _setConfig: SetConfType,
   ): void {
@@ -48,12 +48,12 @@ export class ListenbrainzScrobbler extends ScrobblerBase {
       return;
     }
 
-    const body = createRequestBody('playing_now', songInfo);
+    const body = createRequestBody('playing_now', videoInfo);
     submitListen(body, config);
   }
 
   override addScrobble(
-    songInfo: SongInfo,
+    videoInfo: VideoInfo,
     config: ScrobblerPluginConfig,
     _setConfig: SetConfType,
   ): void {
@@ -64,7 +64,7 @@ export class ListenbrainzScrobbler extends ScrobblerBase {
       return;
     }
 
-    const body = createRequestBody('single', songInfo);
+    const body = createRequestBody('single', videoInfo);
     body.payload[0].listened_at = Math.trunc(Date.now() / 1000);
 
     submitListen(body, config);
@@ -73,17 +73,17 @@ export class ListenbrainzScrobbler extends ScrobblerBase {
 
 function createRequestBody(
   listenType: string,
-  songInfo: SongInfo,
+  videoInfo: VideoInfo,
 ): ListenbrainzRequestBody {
   const trackMetadata = {
-    artist_name: songInfo.artist,
-    track_name: songInfo.title,
-    release_name: songInfo.album ?? undefined,
+    artist_name: videoInfo.author,
+    track_name: videoInfo.title,
+    release_name: undefined,
     additional_info: {
       media_player: 'YouTube Desktop App',
       submission_client: 'YouTube Desktop App - Scrobbler Plugin',
-      origin_url: songInfo.url,
-      duration: songInfo.songDuration,
+      origin_url: videoInfo.url,
+      duration: videoInfo.videoDuration,
     },
   };
 

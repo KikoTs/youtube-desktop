@@ -369,7 +369,7 @@ export interface YoutubePlayer {
    */
   getCurrentTime: () => number;
   /**
-   * @return int song duration in seconds
+   * @return int video duration in seconds
    */
   getDuration: () => number;
   addEventListener: <K extends keyof PlayerAPIEvents>(

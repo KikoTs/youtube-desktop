@@ -3,7 +3,7 @@ import keyEventAreEqual from 'keyboardevents-areequal';
 
 import pipHTML from './templates/picture-in-picture.html?raw';
 
-import { getSongMenu } from '@/providers/dom-elements';
+import { getVideoMenu } from '@/providers/dom-elements';
 
 import { ElementFromHtml } from '../utils/renderer';
 
@@ -45,7 +45,7 @@ function cloneButton(query: string) {
 
 const observer = new MutationObserver(() => {
   if (!menu) {
-    menu = getSongMenu();
+    menu = getVideoMenu();
     if (!menu) {
       return;
     }

@@ -51,9 +51,9 @@ export default createPlugin({
       this.opacity = config.opacity;
       this.isFullscreen = config.fullscreen;
 
-      const songImage = document.querySelector<HTMLImageElement>('#song-image');
+      const videoImage = document.querySelector<HTMLImageElement>('#song-image');
       const songVideo = document.querySelector<HTMLDivElement>('#song-video');
-      const image = songImage?.querySelector<HTMLImageElement>(
+      const image = videoImage?.querySelector<HTMLImageElement>(
         'yt-img-shadow > img',
       );
       const video = await waitForElement<HTMLVideoElement>(
@@ -65,7 +65,7 @@ export default createPlugin({
       );
 
       const injectBlurImage = () => {
-        if (!songImage || !image) return null;
+        if (!videoImage || !image) return null;
 
         this.lastImageSource = image.src;
 
@@ -85,7 +85,7 @@ export default createPlugin({
         this.update();
 
         /* injecting */
-        songImage.prepend(blurImage);
+        videoImage.prepend(blurImage);
 
         /* cleanup */
         return () => {

@@ -1,10 +1,9 @@
 import { BrowserWindow } from 'electron';
 
 import registerCallback, {
-  MediaType,
-  type SongInfo,
-  SongInfoEvent,
-} from '@/providers/song-info';
+  type VideoInfo,
+  VideoInfoEvent,
+} from '@/providers/video-info';
 import { createBackend } from '@/utils';
 
 import { LastFmScrobbler } from './services/lastfm';
@@ -71,30 +70,31 @@ export const backend = createBackend<
     await this.createSessions(config, setConfig);
     this.setConfig = setConfig;
 
-    registerCallback((songInfo: SongInfo, event) => {
-      if (event === SongInfoEvent.TimeChanged) return;
+    registerCallback((videoInfo: VideoInfo, event) => {
+      if (event === VideoInfoEvent.TimeChanged) return;
       // Set remove the old scrobble timer
       clearTimeout(scrobbleTimer);
-      if (!songInfo.isPaused) {
+      if (!videoInfo.isPaused) {
         const configNonnull = this.config!;
         // Scrobblers normally have no trouble working with official music videos
-        if (
-          !configNonnull.scrobbleOtherMedia &&
-          songInfo.mediaType !== MediaType.Audio &&
-          songInfo.mediaType !== MediaType.OriginalMusicVideo
-        ) {
-          return;
-        }
 
-        // Scrobble when the song is halfway through, or has passed the 4-minute mark
+        // if ( // idk how to handle this
+        //   !configNonnull.scrobbleOtherMedia &&
+        //   videoInfo.mediaType !== MediaType.Audio &&
+        //   videoInfo.mediaType !== MediaType.OriginalMusicVideo
+        // ) {
+        //   return;
+        // }
+
+        // Scrobble when the video is halfway through, or has passed the 4-minute mark
         const scrobbleTime = Math.min(
-          Math.ceil(songInfo.songDuration / 2),
+          Math.ceil(videoInfo.videoDuration / 2),
           4 * 60,
         );
-        if (scrobbleTime > (songInfo.elapsedSeconds ?? 0)) {
+        if (scrobbleTime > (videoInfo.elapsedSeconds ?? 0)) {
           // Scrobble still needs to happen
           const timeToWait =
-            (scrobbleTime - (songInfo.elapsedSeconds ?? 0)) * 1000;
+            (scrobbleTime - (videoInfo.elapsedSeconds ?? 0)) * 1000;
           scrobbleTimer = setTimeout(
             (info, config) => {
               this.enabledScrobblers.forEach((scrobbler) =>
@@ -102,13 +102,13 @@ export const backend = createBackend<
               );
             },
             timeToWait,
-            songInfo,
+            videoInfo,
             configNonnull,
           );
         }
 
         this.enabledScrobblers.forEach((scrobbler) =>
-          scrobbler.setNowPlaying(songInfo, configNonnull, setConfig),
+          scrobbler.setNowPlaying(videoInfo, configNonnull, setConfig),
         );
       }
     });

@@ -4,7 +4,7 @@ import { t } from '@/i18n';
 
 import { defaultTrustedTypePolicy } from '@/utils/trusted-types';
 
-import type { SongInfo } from '@/providers/song-info';
+import type { VideoInfo } from '@/providers/video-info';
 import type { RendererContext } from '@/types/contexts';
 import type { LyricsGeniusPluginConfig } from '@/plugins/lyrics-genius/index';
 
@@ -38,7 +38,7 @@ export const onRendererLoad = ({
 
   let unregister: (() => void) | null = null;
 
-  on('ytd:update-song-info', (extractedSongInfo: SongInfo) => {
+  on('ytd:update-video-info', (extractedVideoInfo: VideoInfo) => {
     unregister?.();
 
     setTimeout(async () => {
@@ -54,7 +54,7 @@ export const onRendererLoad = ({
 
       const lyrics = (await invoke(
         'search-genius-lyrics',
-        extractedSongInfo,
+        extractedVideoInfo,
       )) as string | null;
 
       if (!lyrics) {

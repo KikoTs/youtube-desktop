@@ -35,7 +35,7 @@ import { refreshMenu, setApplicationMenu } from '@/menu';
 import { fileExists, injectCSS, injectCSSAsFile } from '@/plugins/utils/main';
 import { isTesting } from '@/utils/testing';
 import { setUpTray } from '@/tray';
-import { setupSongInfo } from '@/providers/song-info';
+import { setupVideoInfo } from '@/providers/video-info';
 import { restart, setupAppControls } from '@/providers/app-controls';
 import {
   APP_PROTOCOL,
@@ -530,7 +530,7 @@ app.once('browser-window-created', (_event, win) => {
     });
   }
 
-  setupSongInfo(win);
+  setupVideoInfo(win);
   setupAppControls();
 
   win.webContents.on(

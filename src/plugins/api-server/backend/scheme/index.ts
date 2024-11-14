@@ -1,5 +1,5 @@
 export * from './auth';
-export * from './song-info';
+export * from './video-info';
 export * from './go-back';
 export * from './go-forward';
 export * from './switch-repeat';

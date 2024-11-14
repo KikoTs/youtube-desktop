@@ -1,7 +1,7 @@
 import { net } from 'electron';
 
 import { createPlugin } from '@/utils';
-import registerCallback from '@/providers/song-info';
+import registerCallback from '@/providers/video-info';
 import { t } from '@/i18n';
 
 type LumiaData = {
@@ -69,31 +69,31 @@ export default createPlugin({
       ipc.send('ytd:setup-time-changed-listener'),
     );
 
-    registerCallback((songInfo) => {
-      if (!songInfo.title && !songInfo.artist) {
+    registerCallback((videoInfo) => {
+      if (!videoInfo.title && !videoInfo.author) {
         return;
       }
 
       if (previousStatePaused === null) {
         data.eventType = 'switchSong';
-      } else if (previousStatePaused !== songInfo.isPaused) {
+      } else if (previousStatePaused !== videoInfo.isPaused) {
         data.eventType = 'playPause';
       }
 
-      data.duration = secToMilisec(songInfo.songDuration);
-      data.progress = secToMilisec(songInfo.elapsedSeconds);
-      data.url = songInfo.url;
-      data.videoId = songInfo.videoId;
-      data.playlistId = songInfo.playlistId;
-      data.cover = songInfo.imageSrc;
-      data.cover_url = songInfo.imageSrc;
-      data.album_url = songInfo.imageSrc;
-      data.title = songInfo.title;
-      data.artists = [songInfo.artist];
-      data.status = songInfo.isPaused ? 'stopped' : 'playing';
-      data.isPaused = songInfo.isPaused;
-      data.album = songInfo.album;
-      data.views = songInfo.views;
+      data.duration = secToMilisec(videoInfo.videoDuration);
+      data.progress = secToMilisec(videoInfo.elapsedSeconds);
+      data.url = videoInfo.url;
+      data.videoId = videoInfo.videoId;
+      data.playlistId = videoInfo.playlistId;
+      data.cover = videoInfo.imageSrc;
+      data.cover_url = videoInfo.imageSrc;
+      data.album_url = videoInfo.imageSrc;
+      data.title = videoInfo.title;
+      data.artists = [videoInfo.author];
+      data.status = videoInfo.isPaused ? 'stopped' : 'playing';
+      data.isPaused = videoInfo.isPaused;
+      data.album = "" // idk what to put here
+      data.views = videoInfo.views;
       post(data);
     });
   },

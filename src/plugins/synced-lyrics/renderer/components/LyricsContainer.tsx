@@ -3,7 +3,7 @@ import { createSignal, For, Match, Show, Switch } from 'solid-js';
 import { SyncedLine } from './SyncedLine';
 
 import { t } from '@/i18n';
-import { getSongInfo } from '@/providers/song-info-front';
+import { getVideoInfo } from '@/providers/video-info-front';
 
 import {
   differentDuration,
@@ -26,7 +26,7 @@ export const LyricsContainer = () => {
     if (isFetching()) return;
     setError('');
 
-    const info = getSongInfo();
+    const info = getVideoInfo();
     await makeLyricsRequest(info).catch((err) => {
       setError(String(err));
     });

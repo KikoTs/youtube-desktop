@@ -1,4 +1,4 @@
-// This is used for to control the songs
+// This is used for to control the videos
 import { BrowserWindow } from 'electron';
 
 // see protocol-handler.ts

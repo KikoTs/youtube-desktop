@@ -4,7 +4,7 @@ import { cors } from 'hono/cors';
 import { swaggerUI } from '@hono/swagger-ui';
 import { serve } from '@hono/node-server';
 
-import registerCallback from '@/providers/song-info';
+import registerCallback from '@/providers/video-info';
 import { createBackend } from '@/utils';
 
 import { JWTPayloadSchema } from './scheme';
@@ -19,8 +19,8 @@ export const backend = createBackend<BackendType, APIServerConfig>({
     const config = await ctx.getConfig();
 
     await this.init(ctx);
-    registerCallback((songInfo) => {
-      this.songInfo = songInfo;
+    registerCallback((videoInfo) => {
+      this.videoInfo = videoInfo;
     });
 
     ctx.ipc.on('ytd:player-api-loaded', () => ctx.ipc.send('ytd:setup-time-changed-listener'));
@@ -75,7 +75,7 @@ export const backend = createBackend<BackendType, APIServerConfig>({
     });
 
     // routes
-    registerControl(this.app, ctx, () => this.songInfo);
+    registerControl(this.app, ctx, () => this.videoInfo);
     registerAuth(this.app, ctx);
 
     // swagger

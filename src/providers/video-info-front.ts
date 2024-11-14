@@ -8,20 +8,20 @@ import type {
   VideoDataChangeValue,
 } from '@/types/player-api-events';
 
-import type { SongInfo } from './song-info';
+import type { VideoInfo } from './video-info';
 import type { VideoDataChanged } from '@/types/video-data-changed';
 
-let songInfo: SongInfo = {} as SongInfo;
-export const getSongInfo = () => songInfo;
+let videoInfo: VideoInfo = {} as VideoInfo;
+export const getVideoInfo = () => videoInfo;
 
 window.ipcRenderer.on(
-  'ytd:update-song-info',
-  (_, extractedSongInfo: SongInfo) => {
-    songInfo = extractedSongInfo;
+  'ytd:update-video-info',
+  (_, extractedVideoInfo: VideoInfo) => {
+    videoInfo = extractedVideoInfo;
   },
 );
 
-// Used because 'loadeddata' or 'loadedmetadata' weren't firing on song start for some users (https://github.com/th-ch/youtube-music/issues/473)
+// Used because 'loadeddata' or 'loadedmetadata' weren't firing on video start for some users (https://github.com/th-ch/youtube-music/issues/473)
 const srcChangedEvent = new CustomEvent('ytd:src-changed');
 
 export const setupSeekedListener = singleton(() => {
@@ -38,7 +38,7 @@ export const setupTimeChangedListener = singleton(() => {
       const target = mutation.target as Node & { value: string };
       const numberValue = Number(target.value);
       window.ipcRenderer.send('ytd:time-changed', numberValue);
-      songInfo.elapsedSeconds = numberValue;
+      videoInfo.elapsedSeconds = numberValue;
     }
   });
   const progressBar = document.querySelector('#progress-bar');
@@ -186,7 +186,7 @@ export default (api: YoutubePlayer) => {
 
     if (name === 'dataupdated' && waitingEvent.has(videoData.videoId)) {
       waitingEvent.delete(videoData.videoId);
-      sendSongInfo(videoData);
+      sendVideoInfo(videoData);
     } else if (name === 'dataloaded') {
       const video = document.querySelector<HTMLVideoElement>('video');
       video?.dispatchEvent(srcChangedEvent);
@@ -217,7 +217,7 @@ export default (api: YoutubePlayer) => {
 
       const watchNextResponse = api.getWatchNextResponse();
 
-      sendSongInfo({
+      sendVideoInfo({
         title,
         author,
         videoId,
@@ -232,7 +232,7 @@ export default (api: YoutubePlayer) => {
     }
   }
 
-  function sendSongInfo(videoData: VideoDataChangeValue) {
+  function sendVideoInfo(videoData: VideoDataChangeValue) {
     const data = api.getPlayerResponse();
 
     let playerOverlay: PlayerOverlays | undefined;

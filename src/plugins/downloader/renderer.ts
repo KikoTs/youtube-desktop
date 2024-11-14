@@ -1,8 +1,8 @@
 import downloadHTML from './templates/download.html?raw';
 
 import defaultConfig from '@/config/defaults';
-import { getSongMenu } from '@/providers/dom-elements';
-import { getSongInfo } from '@/providers/song-info-front';
+import { getVideoMenu } from '@/providers/dom-elements';
+import { getVideoInfo } from '@/providers/video-info-front';
 
 import { LoggerPrefix } from '@/utils';
 
@@ -24,7 +24,7 @@ let doneFirstLoad = false;
 
 const menuObserver = new MutationObserver(() => {
   if (!menu) {
-    menu = getSongMenu();
+    menu = getVideoMenu();
     if (!menu) {
       return;
     }
@@ -67,16 +67,16 @@ export const onRendererLoad = ({
   ipc,
 }: RendererContext<DownloaderPluginConfig>) => {
   window.download = () => {
-    const songMenu = getSongMenu();
-    let videoUrl = songMenu
+    const videoMenu = getVideoMenu();
+    let videoUrl = videoMenu
       // Selector of first button which is always "Start Radio"
       ?.querySelector(
         'ytmusic-menu-navigation-item-renderer[tabindex="0"] #navigation-endpoint',
       )
       ?.getAttribute('href');
 
-    if (!videoUrl && songMenu) {
-      for (const it of songMenu.querySelectorAll(
+    if (!videoUrl && videoMenu) {
+      for (const it of videoMenu.querySelectorAll(
         'ytmusic-menu-navigation-item-renderer[tabindex="-1"] #navigation-endpoint',
       )) {
         if (it.getAttribute('href')?.includes('podcast/')) {
@@ -101,7 +101,7 @@ export const onRendererLoad = ({
         return;
       }
     } else {
-      videoUrl = getSongInfo().url || window.location.href;
+      videoUrl = getVideoInfo().url || window.location.href;
     }
 
     ipc.invoke('download-song', videoUrl);

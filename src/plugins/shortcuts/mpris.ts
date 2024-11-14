@@ -15,10 +15,10 @@ import MprisPlayer, {
 } from '@jellybrick/mpris-service';
 
 import registerCallback, {
-  type SongInfo,
-  SongInfoEvent,
-} from '@/providers/song-info';
-import getSongControls from '@/providers/song-controls';
+  type VideoInfo,
+  VideoInfoEvent,
+} from '@/providers/video-info';
+import getVideoControls from '@/providers/video-controls';
 import config from '@/config';
 import { LoggerPrefix } from '@/utils';
 
@@ -84,7 +84,7 @@ function setupMPRIS() {
 }
 
 function registerMPRIS(win: BrowserWindow) {
-  const songControls = getSongControls(win);
+  const videoControls = getVideoControls(win);
   const {
     playPause,
     next,
@@ -95,9 +95,9 @@ function registerMPRIS(win: BrowserWindow) {
     setFullscreen,
     requestFullscreenInformation,
     requestQueueInformation,
-  } = songControls;
+  } = videoControls;
   try {
-    let currentSongInfo: SongInfo | null = null;
+    let currentVideoInfo: VideoInfo | null = null;
     const secToMicro = (n: number) => Math.round(Number(n) * 1e6);
     const microToSec = (n: number) => Math.round(Number(n) / 1e6);
 
@@ -109,8 +109,8 @@ function registerMPRIS(win: BrowserWindow) {
 
     const seekTo = (event: Position) => {
       if (
-        currentSongInfo?.videoId &&
-        event.trackId.endsWith(correctId(currentSongInfo.videoId))
+        currentVideoInfo?.videoId &&
+        event.trackId.endsWith(correctId(currentVideoInfo.videoId))
       ) {
         win.webContents.send('ytd:seek-to', microToSec(event.position ?? 0));
         player.setPosition(event.position ?? 0);
@@ -318,39 +318,36 @@ function registerMPRIS(win: BrowserWindow) {
       }
     });
 
-    registerCallback((songInfo: SongInfo, event) => {
-      if (event === SongInfoEvent.TimeChanged) {
-        player.setPosition(secToMicro(songInfo.elapsedSeconds ?? 0));
+    registerCallback((videoInfo: VideoInfo, event) => {
+      if (event === VideoInfoEvent.TimeChanged) {
+        player.setPosition(secToMicro(videoInfo.elapsedSeconds ?? 0));
         return;
       }
       if (player) {
         const data: Track = {
-          'mpris:length': secToMicro(songInfo.songDuration),
-          ...(songInfo.imageSrc
-            ? { 'mpris:artUrl': songInfo.imageSrc }
+          'mpris:length': secToMicro(videoInfo.videoDuration),
+          ...(videoInfo.imageSrc
+            ? { 'mpris:artUrl': videoInfo.imageSrc }
             : undefined),
-          'xesam:title': songInfo.title,
-          'xesam:url': songInfo.url,
-          'xesam:artist': [songInfo.artist],
+          'xesam:title': videoInfo.title,
+          'xesam:url': videoInfo.url,
+          'xesam:artist': [videoInfo.author],
           'mpris:trackid': player.objectPath(
-            `Track/${correctId(songInfo.videoId)}`,
+            `Track/${correctId(videoInfo.videoId)}`,
           ),
         };
-        if (songInfo.album) {
-          data['xesam:album'] = songInfo.album;
-        }
-        currentSongInfo = songInfo;
+        currentVideoInfo = videoInfo;
 
         player.metadata = data;
 
         const currentElapsedMicroSeconds = secToMicro(
-          songInfo.elapsedSeconds ?? 0,
+          videoInfo.elapsedSeconds ?? 0,
         );
         player.setPosition(currentElapsedMicroSeconds);
         player.seeked(currentElapsedMicroSeconds);
 
         player.setPlaybackStatus(
-          songInfo.isPaused ? PLAYBACK_STATUS_PAUSED : PLAYBACK_STATUS_PLAYING,
+          videoInfo.isPaused ? PLAYBACK_STATUS_PAUSED : PLAYBACK_STATUS_PLAYING,
         );
       }
       requestQueueInformation();

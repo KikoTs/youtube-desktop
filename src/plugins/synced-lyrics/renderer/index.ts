@@ -8,7 +8,7 @@ import { setCurrentTime } from './components/LyricsContainer';
 
 import type { RendererContext } from '@/types/contexts';
 import type { YoutubePlayer } from '@/types/youtube-player';
-import type { SongInfo } from '@/providers/song-info';
+import type { VideoInfo } from '@/providers/video-info';
 
 import type { SyncedLyricsPluginConfig } from '../types';
 
@@ -73,7 +73,7 @@ export const renderer = createRenderer<
   async start(ctx: RendererContext<SyncedLyricsPluginConfig>) {
     setConfig(await ctx.getConfig());
 
-    ctx.ipc.on('ytd:update-song-info', async (info: SongInfo) => {
+    ctx.ipc.on('ytd:update-video-info', async (info: VideoInfo) => {
       await makeLyricsRequest(info);
     });
   },

@@ -1,7 +1,7 @@
 import i18next from 'i18next';
 
 import { startingPages } from './providers/extracted-data';
-import setupSongInfo from './providers/song-info-front';
+import setupVideoInfo from './providers/video-info-front';
 import {
   createContext,
   forceLoadRendererPlugin,
@@ -352,8 +352,8 @@ const initObserver = async () => {
     if (playerApi) {
       observer.disconnect();
 
-      // Inject song-info provider
-      setupSongInfo(playerApi);
+      // Inject video-info provider
+      setupVideoInfo(playerApi);
       const dataLoadedListener = (name: string) => {
         if (!firstDataLoaded && name === 'dataloaded') {
           firstDataLoaded = true;

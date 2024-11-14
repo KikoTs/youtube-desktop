@@ -28,10 +28,9 @@ import { isEnabled } from '@/config/plugins';
 import registerCallback, {
   cleanupName,
   getImage,
-  MediaType,
-  type SongInfo,
-  SongInfoEvent,
-} from '@/providers/song-info';
+  type VideoInfo as SongInfo,
+  VideoInfoEvent as SongInfoEvent,
+} from '@/providers/video-info';
 import { getNetFetchAsFetch } from '@/plugins/utils/main';
 
 import { t } from '@/i18n';
@@ -116,7 +115,10 @@ export const onMainLoad = async ({
   });
   ipc.handle('download-song', (url: string) => downloadSong(url));
   ipc.on('ytd:video-src-changed', (data: GetPlayerResponse) => {
-    playingUrl = data.microformat.microformatDataRenderer.urlCanonical;
+    const microformat = data.microformat.playerMicroformatRenderer
+    const videoId = microformat.embed.iframeUrl.split('/embed/')[1];
+    const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    playingUrl = videoUrl;
   });
   ipc.handle('download-playlist-request', async (url: string) =>
     downloadPlaylist(url),
@@ -180,15 +182,15 @@ function downloadSongOnFinishSetup({
 
   const defaultDownloadFolder = app.getPath('downloads');
 
-  registerCallback((songInfo: SongInfo, event) => {
+  registerCallback((videoInfo: SongInfo, event) => {
     if (event === SongInfoEvent.TimeChanged) {
-      const elapsedSeconds = songInfo.elapsedSeconds ?? 0;
+      const elapsedSeconds = videoInfo.elapsedSeconds ?? 0;
       if (elapsedSeconds > time) time = elapsedSeconds;
       return;
     }
     if (
-      !songInfo.isPaused &&
-      songInfo.url !== currentUrl &&
+      !videoInfo.isPaused &&
+      videoInfo.url !== currentUrl &&
       config.downloadOnFinish?.enabled
     ) {
       if (typeof currentUrl === 'string' && duration && duration > 0) {
@@ -215,8 +217,8 @@ function downloadSongOnFinishSetup({
         }
       }
 
-      currentUrl = songInfo.url;
-      duration = songInfo.songDuration;
+      currentUrl = videoInfo.url;
+      duration = videoInfo.videoDuration;
       time = 0;
     }
   });
@@ -265,15 +267,15 @@ async function downloadSongUnsafe(
   }
 
   const metadata = getMetadata(info);
-  if (metadata.album === 'N/A') {
-    metadata.album = '';
-  }
+  // if (metadata.album === 'N/A') { // no wtf
+  //   metadata.album = '';
+  // }
 
   metadata.trackId = trackId;
 
   const dir =
     playlistFolder || config.downloadFolder || app.getPath('downloads');
-  const name = `${metadata.artist ? `${metadata.artist} - ` : ''}${
+  const name = `${metadata.author ? `${metadata.author} - ` : ''}${
     metadata.title
   }`;
   setName(name);
@@ -347,7 +349,7 @@ async function downloadSongUnsafe(
 
   console.info(
     t('plugins.downloader.backend.feedback.download-info', {
-      artist: metadata.artist,
+      artist: metadata.author,
       title: metadata.title,
       videoId: metadata.videoId,
     }),
@@ -503,11 +505,11 @@ async function writeID3(
 
     // Create the metadata tags
     tags.title = metadata.title;
-    tags.artist = metadata.artist;
+    tags.artist = metadata.author;
 
-    if (metadata.album) {
-      tags.album = metadata.album;
-    }
+    // if (metadata.album) { // no wtf
+    //   tags.album = metadata.album;
+    // }
 
     const coverBuffer = await getCoverBuffer(metadata.imageSrc ?? '');
     if (coverBuffer) {
@@ -537,7 +539,7 @@ async function writeID3(
 
     return NodeID3.write(tags, buffer);
   } catch (error: unknown) {
-    sendError(error as Error, `${metadata.artist} - ${metadata.title}`);
+    sendError(error as Error, `${metadata.author} - ${metadata.title}`);
     return null;
   }
 }
@@ -735,8 +737,8 @@ function getFFmpegMetadataArgs(metadata: CustomSongInfo) {
 
   return [
     ...(metadata.title ? ['-metadata', `title=${metadata.title}`] : []),
-    ...(metadata.artist ? ['-metadata', `artist=${metadata.artist}`] : []),
-    ...(metadata.album ? ['-metadata', `album=${metadata.album}`] : []),
+    ...(metadata.author ? ['-metadata', `artist=${metadata.author}`] : []),
+    // ...(metadata.album ? ['-metadata', `album=${metadata.album}`] : []), // no wtf
     ...(metadata.trackId ? ['-metadata', `track=${metadata.trackId}`] : []),
   ];
 }
@@ -761,15 +763,11 @@ const getVideoId = (url: URL | string): string | null => {
 const getMetadata = (info: TrackInfo): CustomSongInfo => ({
   videoId: info.basic_info.id!,
   title: cleanupName(info.basic_info.title!),
-  artist: cleanupName(info.basic_info.author!),
-  album: info.player_overlays?.browser_media_session?.as(
-    YTNodes.BrowserMediaSession,
-  ).album?.text,
+  author: cleanupName(info.basic_info.author!),
   imageSrc: info.basic_info.thumbnail?.find((t) => !t.url.endsWith('.webp'))
     ?.url,
   views: info.basic_info.view_count!,
-  songDuration: info.basic_info.duration!,
-  mediaType: MediaType.Audio,
+  videoDuration: info.basic_info.duration!,
 });
 
 // This is used to bypass age restrictions

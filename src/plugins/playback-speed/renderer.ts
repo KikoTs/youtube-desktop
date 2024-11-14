@@ -1,6 +1,6 @@
 import sliderHTML from './templates/slider.html?raw';
 
-import { getSongMenu } from '@/providers/dom-elements';
+import { getVideoMenu } from '@/providers/dom-elements';
 import { singleton } from '@/providers/decorators';
 
 import { defaultTrustedTypePolicy } from '@/utils/trusted-types';
@@ -56,7 +56,7 @@ const setupSliderListener = singleton(() => {
 const observePopupContainer = () => {
   const observer = new MutationObserver(() => {
     if (!menu) {
-      menu = getSongMenu();
+      menu = getVideoMenu();
     }
 
     if (menu && !menu.contains(slider)) {
@@ -131,7 +131,7 @@ export const onUnload = () => {
     video.removeEventListener('ytd:src-changed', forcePlaybackRate);
   }
   slider.removeEventListener('wheel', wheelEventListener);
-  getSongMenu()?.removeChild(slider);
+  getVideoMenu()?.removeChild(slider);
   document
     .querySelector('#playback-speed-slider')
     ?.removeEventListener(
