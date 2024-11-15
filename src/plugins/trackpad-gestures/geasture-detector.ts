@@ -55,16 +55,23 @@ export interface EventData {
 
 export class GestureDetector {
     events = new EventTarget()
-    gestureData: EventData = null
+    gestureData: EventData = {
+        gestureType: Gesture.UNKNOWN,
+        sumVertical: 0,
+        sumHorizontal: 0,
+        eventCount: 0,
+        ctrlKey: false,
+        handle: false,
+    }
     // gestureData = null
     waitForAnotherStart = true
 
     addEventListener(eventName: EventNames, listener: (event: CustomEvent<EventData>) => void): void {
-        this.events.addEventListener(eventName, listener)
+        this.events.addEventListener(eventName, listener as EventListener)
     }
 
     removeEventListener(eventName: EventNames, listener: (event: CustomEvent<EventData>) => void): void {
-        this.events.removeEventListener(eventName, listener)
+        this.events.removeEventListener(eventName, listener as EventListener)
     }
 
     constructor() {
@@ -107,7 +114,7 @@ export class GestureDetector {
         const event = new CustomEvent<EventData>('gesture-ended', { detail: this.gestureData })
 
         this.events.dispatchEvent(event)
-        this.gestureData = null
+        this.resetGestureData()
     }
 
     handleEventCancel() {
@@ -142,12 +149,8 @@ export class GestureDetector {
         return Gesture.UNKNOWN
     }
 
-    handleWheelEvent({
-        phase, momentumPhase,
-        deltaX, deltaY,
-        ctrlKey,
-    // }) {
-    }: GestureWheelEvent) {
+    handleWheelEvent(event: WheelEvent) {
+        const { phase, momentumPhase, deltaX, deltaY, ctrlKey } = event as GestureWheelEvent;
         if (phase === Phase.kPhaseBegan) { // Gesture begining
             return this.handleEventStart(ctrlKey)
         }
