@@ -1,0 +1,60 @@
+/* Remove empty spaces in grid */
+ytd-rich-grid-row,
+#contents.ytd-rich-grid-row {
+    display: contents !important;
+}
+
+/* Hide videos with #shorts in title */
+ytd-grid-video-renderer:has(#video-title:has-text(/(^| )#Shorts?( |$)/i)),
+ytd-rich-item-renderer:has(#video-title:has-text(/(^| )#Shorts?( |$)/i)) {
+    display: none;
+}
+
+/* Hide videos with shorts indicator */
+ytd-grid-video-renderer:has([overlay-style="SHORTS"]),
+ytd-rich-item-renderer:has([overlay-style="SHORTS"]),
+ytd-video-renderer:has([overlay-style="SHORTS"]),
+ytd-item-section-renderer.ytd-section-list-renderer[page-subtype="subscriptions"]:has(ytd-video-renderer:has([overlay-style="SHORTS"])) {
+    display: none;
+}
+
+/* Hide shorts sidebar button */
+ytd-guide-entry-renderer:has(yt-formatted-string:has-text(/^Shorts$/i)),
+ytd-mini-guide-entry-renderer:has(.title:has-text(/^Shorts$/i)) {
+    display: none;
+}
+
+/* Hide shorts sections (except on history page) */
+ytd-rich-section-renderer:has(#title:has-text(/(^| )Shorts( |$)/i)),
+ytd-reel-shelf-renderer:has(.ytd-reel-shelf-renderer:has-text(/(^| )Shorts( |$)/i)) {
+    display: none;
+}
+
+/* Hide shorts tab on channel pages */
+tp-yt-paper-tab:has(.tp-yt-paper-tab:has-text(Shorts)),
+yt-tab-shape:has-text(/^Shorts$/) {
+    display: none;
+}
+
+/* Hide short remixes */
+ytd-reel-shelf-renderer:has(#title:has-text(/(^| )Shorts.?Remix.*$/i)) {
+    display: none;
+}
+
+/* Hide shorts category */
+yt-chip-cloud-chip-renderer:has(yt-formatted-string:has-text(/^Shorts$/i)) {
+    display: none;
+}
+
+/* Mobile Specific Styles */
+ytm-rich-item-renderer:has(#video-title:has-text(/(^| )#Shorts?( |$)/i)),
+ytm-item-section-renderer:has(#video-title:has-text(/(^| )#Shorts?( |$)/i)),
+ytm-pivot-bar-item-renderer:has(.pivot-shorts),
+ytm-video-with-context-renderer:has([data-style="SHORTS"]),
+ytm-rich-section-renderer:has(.reel-shelf-title-wrapper .yt-core-attributed-string:has-text(/(^| )Shorts( |$)/i)),
+ytm-reel-shelf-renderer.item:has(.reel-shelf-title-wrapper .yt-core-attributed-string:has-text(/(^| )Shorts( |$)/i)),
+.single-column-browse-results-tabs > a:has-text(Shorts),
+ytm-reel-shelf-renderer:has(.reel-shelf-title-wrapper .yt-core-attributed-string:has-text(/(^| )Shorts.?Remix.*$/i)),
+ytm-chip-cloud-chip-renderer:has(.yt-core-attributed-string:has-text(/^Shorts$/i)) {
+    display: none;
+}

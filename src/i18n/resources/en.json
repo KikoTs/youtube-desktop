@@ -211,6 +211,10 @@
       "description": "If an ad play it mutes the audio and sets playback speed to 16x",
       "name": "Ad Speedup"
     },
+    "shorts-blocker": {
+      "description": "Blocks YouTube Shorts from appearing",
+      "name": "Shorts Blocker"
+    },
     "adblocker": {
       "description": "Block all ads and tracking out of the box",
       "menu": {
