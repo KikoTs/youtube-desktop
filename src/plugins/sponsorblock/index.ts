@@ -174,7 +174,7 @@ export default createPlugin({
       if (!video) return;
   
       const duration = video.duration;
-  
+      console.log(currentSegments[index]);
       currentSegments.forEach(([start, end], index) => {
           const segmentDiv = document.createElement('div');
           segmentDiv.style.flexGrow = '0';
@@ -197,13 +197,13 @@ export default createPlugin({
     getCategoryColor(category: string): string {
         const colors = {
             sponsor: 'rgba(0, 212, 0, 0.5)',
-            intro: 'rgba(0, 255, 0, 0.5)',
+            intro: 'rgba(0, 255, 255, 0.5)',
             outro: 'rgba(0, 0, 255, 0.5)',
-            interaction: 'rgba(255, 255, 0, 0.5)',
-            selfpromo: 'rgba(255, 0, 255, 0.5)',
-            music_offtopic: 'rgba(0, 255, 255, 0.5)',
+            interaction: 'rgba(204, 0, 255, 0.5)',
+            selfpromo: 'rgba(255, 255, 0, 0.5)',
+            music_offtopic: 'rgba(255, 153, 0, 0.5)',
         };
-        return colors[category] || 'rgba(128, 128, 128, 0.5)';
+        return colors[category] || 'rgba(0, 0, 0, 0.5)';
     },
     removeProgressBar() {
         const sponsorBar = document.getElementById('sponsor-bar');
