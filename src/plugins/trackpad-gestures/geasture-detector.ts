@@ -1,4 +1,3 @@
-
 export enum Gesture {
     UNKNOWN = 0,
     ZOOM,
@@ -7,76 +6,64 @@ export enum Gesture {
     SCROLL,
 }
 
-export const enum Phase {
-    // No phase information is avaiable.
+export enum Direction {
+    NONE = 'none',
+    LEFT = 'left',
+    RIGHT = 'right',
+    UP = 'up',
+    DOWN = 'down',
+    IN = 'in',
+    OUT = 'out'
+}
+
+const enum Phase {
     kPhaseNone = 0,
-    // This wheel event is the beginning of a scrolling sequence.
     kPhaseBegan = 1 << 0,
-    // Shows that scrolling is ongoing but the scroll delta for this wheel event
-    // is zero.
     kPhaseStationary = 1 << 1,
-    // Shows that a scroll is ongoing and the scroll delta for this wheel event
-    // is non-zero.
     kPhaseChanged = 1 << 2,
-    // This wheel event is the last event of a scrolling sequence.
     kPhaseEnded = 1 << 3,
-    // A wheel event with phase cancelled shows that the scrolling sequence is
-    // cancelled.
     kPhaseCancelled = 1 << 4,
-    // A wheel event with phase may begin shows that a scrolling sequence may
-    // start.
     kPhaseMayBegin = 1 << 5,
-    // A wheel event with momentum phase blocked shows that a scrolling sequence
-    // will not be followed by a momentum fling. This should only ever be set on
-    // the momentum phase of an event.
     kPhaseBlocked = 1 << 6,
 }
 
-export interface GestureWheelEvent extends WheelEvent {
+interface GestureWheelEvent extends WheelEvent {
     phase: Phase
     momentumPhase: Phase
 }
 
-export type EventNames = (
+type EventNames = (
     | 'gesture-started'
     | 'gesture-detected'
     | 'gesture-in-progress'
     | 'gesture-ended'
 )
 
-export interface EventData {
+interface EventData {
     gestureType: Gesture
-    sumVertical: number // Horizontal
-    sumHorizontal: number // Vertical
+    sumVertical: number
+    sumHorizontal: number
     eventCount: number
     ctrlKey: boolean
     handle: boolean
+    direction: Direction
 }
 
 export class GestureDetector {
     events = new EventTarget()
-    gestureData: EventData = {
-        gestureType: Gesture.UNKNOWN,
-        sumVertical: 0,
-        sumHorizontal: 0,
-        eventCount: 0,
-        ctrlKey: false,
-        handle: false,
-    }
-    // gestureData = null
+    gestureData: EventData = null
     waitForAnotherStart = true
 
     addEventListener(eventName: EventNames, listener: (event: CustomEvent<EventData>) => void): void {
-        this.events.addEventListener(eventName, listener as EventListener)
+        this.events.addEventListener(eventName, listener)
     }
 
     removeEventListener(eventName: EventNames, listener: (event: CustomEvent<EventData>) => void): void {
-        this.events.removeEventListener(eventName, listener as EventListener)
+        this.events.removeEventListener(eventName, listener)
     }
 
     constructor() {
         this.resetGestureData()
-
         window.addEventListener('wheel', this.handleWheelEvent.bind(this), { passive: true })
     }
 
@@ -88,10 +75,10 @@ export class GestureDetector {
             sumHorizontal: 0,
             eventCount: 0,
             handle: false,
+            direction: Direction.NONE,
         }
     }
 
-    // handleEventStart(ctrlKey) {
     handleEventStart(ctrlKey: boolean) {
         this.resetGestureData()
         this.gestureData.ctrlKey = ctrlKey
@@ -110,11 +97,9 @@ export class GestureDetector {
     handleEventEnded(shouldHandle: boolean) {
         this.waitForAnotherStart = true
         this.gestureData.handle = shouldHandle
-
         const event = new CustomEvent<EventData>('gesture-ended', { detail: this.gestureData })
-
         this.events.dispatchEvent(event)
-        this.resetGestureData()
+        this.gestureData = null
     }
 
     handleEventCancel() {
@@ -130,11 +115,6 @@ export class GestureDetector {
         const absHorizontal = Math.abs(this.gestureData?.sumHorizontal)
 
         if (this.gestureData.ctrlKey && absVertical && !absHorizontal) {
-            /**
-             * TODO: Find a way to separate wheel+ctr and two-finder-pinch.
-             * They are as far as I know identical in many ways
-             */
-
             return Gesture.SCALE
         }
 
@@ -149,64 +129,72 @@ export class GestureDetector {
         return Gesture.UNKNOWN
     }
 
-    handleWheelEvent(event: WheelEvent) {
-        const { phase, momentumPhase, deltaX, deltaY, ctrlKey } = event as GestureWheelEvent;
-        if (phase === Phase.kPhaseBegan) { // Gesture begining
-            return this.handleEventStart(ctrlKey)
+    detectDirection(deltaX: number, deltaY: number): Direction {
+        switch (this.gestureData.gestureType) {
+            case Gesture.SWIPE:
+                return deltaX > 0 ? Direction.LEFT : Direction.RIGHT
+            
+            case Gesture.SCROLL:
+                return deltaY > 0 ? Direction.DOWN : Direction.UP
+            
+            case Gesture.SCALE:
+                return deltaY > 0 ? Direction.OUT : Direction.IN
+            
+            default:
+                return Direction.NONE
         }
+    }
 
-        if (this.waitForAnotherStart) return // Ignore events
-
-        if (phase === Phase.kPhaseCancelled) {
-            return this.handleEventCancel()
-        }
-
-        /**
-         * When momentum movement starts, it delays the regular phase end until the momentum ends
-         * In this case, we consider momentum start phase as regulas phase end
-         */
-        if (phase === Phase.kPhaseEnded || momentumPhase === Phase.kPhaseBegan) { // Gesture ended
-            return this.handleEventFinished()
-        }
-
-        // After this point, ignore all phases other than kPhaseChanged
-        if (phase !== Phase.kPhaseChanged && momentumPhase !== Phase.kPhaseChanged) return
-
-        // No momentum events allowed after this point
-        if (momentumPhase !== Phase.kPhaseNone) return
-
-        if (phase === Phase.kPhaseChanged || phase === Phase.kPhaseStationary) {
-            // Invert numbers to have more graph-like X/Y movements
-            this.gestureData.sumVertical -= deltaY
-            this.gestureData.sumHorizontal -= deltaX
-            this.gestureData.eventCount++
-
-            const detectedEventType = this.detectEventType()
-
-            // Detect EventType type
-            if (this.gestureData.gestureType === Gesture.UNKNOWN) {
+    handleWheelEvent({
+        phase = Phase.kPhaseChanged,
+        momentumPhase = Phase.kPhaseNone,
+        deltaX,
+        deltaY,
+        ctrlKey,
+    }: Partial<GestureWheelEvent> & WheelEvent) {
+        // console.log('Wheel event's   , { phase, momentumPhase, deltaX, deltaY, ctrlKey })
+    
+        const absDeltaX = Math.abs(deltaX)
+        const absDeltaY = Math.abs(deltaY)
+        
+        if (this.waitForAnotherStart) {
+            if (absDeltaX > 20 || absDeltaY > 20) {
+                this.handleEventStart(ctrlKey)
+                
+                this.gestureData.sumVertical -= deltaY
+                this.gestureData.sumHorizontal -= deltaX
+                this.gestureData.eventCount++
+    
+                const detectedEventType = this.detectEventType()
                 if (detectedEventType !== Gesture.UNKNOWN) {
                     this.gestureData.gestureType = detectedEventType
+                    this.gestureData.direction = this.detectDirection(deltaX, deltaY)
                     this.handleEventDetected()
-                // Detect conditions to cancel gestures
-                } else if (this.gestureData.gestureType !== detectedEventType) {
-                    // TODO: Here is the point where Win and Mac behaviour diverge
-                    // Win: Continues detecting type gesture ends
-                    // Mac: Stops detecting once script changes the detection result
-                    // Pick what you want here :)
-
-                    // return this.handleEventCancel()
                 }
             }
-
-            // Gesture identified and is in progress
-            if (this.gestureData.gestureType !== Gesture.UNKNOWN) {
-                return this.handleEventProgress()
-            }
-
             return
         }
-
-        throw new Error(`Unknown phase configuration ${JSON.stringify({ phase, momentumPhase })}`)
+    
+        if (absDeltaX <= 1 && absDeltaY <= 1) {
+            this.handleEventFinished()
+            return
+        }
+    
+        this.gestureData.sumVertical -= deltaY
+        this.gestureData.sumHorizontal -= deltaX
+        this.gestureData.eventCount++
+    
+        const detectedEventType = this.detectEventType()
+    
+        if (this.gestureData.gestureType === Gesture.UNKNOWN) {
+            if (detectedEventType !== Gesture.UNKNOWN) {
+                this.gestureData.gestureType = detectedEventType
+                this.gestureData.direction = this.detectDirection(deltaX, deltaY)
+                this.handleEventDetected()
+            }
+        } else if (this.gestureData.gestureType !== Gesture.UNKNOWN) {
+            this.gestureData.direction = this.detectDirection(deltaX, deltaY)
+            this.handleEventProgress()
+        }
     }
 }

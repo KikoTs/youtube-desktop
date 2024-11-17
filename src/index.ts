@@ -710,6 +710,17 @@ app.whenReady().then(async () => {
       }
     }
   }
+  ipcMain.on('go-back', () => {
+    if (mainWindow && mainWindow.webContents.navigationHistory.canGoBack()) {
+      mainWindow.webContents.navigationHistory.goBack();
+    }
+  })
+
+  ipcMain.on('go-forward', () => {
+    if (mainWindow && mainWindow.webContents.navigationHistory.canGoForward()) {
+      mainWindow.webContents.navigationHistory.goForward();
+    }
+  })
 
   ipcMain.on('get-renderer-script', (event) => {
     // Inject index.html file as string using insertAdjacentHTML

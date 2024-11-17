@@ -1,11 +1,10 @@
 import { createPlugin } from '@/utils';
 import { t } from '@/i18n';
-
-import { GestureDetector, EventData, Gesture } from './geasture-detector';
+import { GestureDetector, Gesture } from './geasture-detector';
 
 export default createPlugin({
-  name: () => t('plugins.touchpad.name'),
-  description: () => t('plugins.touchpad.description'),
+  name: () => t('plugins.trackpad-gestures.name'),
+  description: () => t('plugins.trackpad-gestures.description'),
   restartNeeded: false,
   config: {
     enabled: false,
@@ -16,31 +15,23 @@ export default createPlugin({
       maximum: 200,
     },
   },
-  renderer({ window }: { window: Window }) {  // Changed from frontend to renderer
+  renderer({ window, config, ipc}: { window: Window; config: any; ipc: any }) {
+    console.log('🚀 Initializing touchpad gesture plugin');
+    console.log();
+    
     const detector = new GestureDetector();
-    const handleGestureEnded = (event: CustomEvent<EventData>) => {
-      const { gestureType, sumHorizontal, handle } = event.detail;
-      
-      if (!handle || gestureType !== Gesture.SWIPE) return;
+  
+  detector.addEventListener('gesture-ended', (event) => {
+    const { gestureType, direction } = event.detail
+    console.log(`Gesture Ended - Type: ${Gesture[gestureType]}, Final Direction: ${direction}`)
+    if(direction == 'right'){
+      ipc.send('go-back')
+    }
+    if(direction == 'left'){
+      ipc.send('go-forward')
+    }
+  })
 
-      const threshold =  50;  // Safe access to config
-      
-      if (Math.abs(sumHorizontal) > threshold) {
-        if (sumHorizontal > 0) {
-          // Swipe right - Go forward
-          window.history.forward();
-        } else {
-          // Swipe left - Go back
-          window.history.back();
-        }
-      }
-    };
 
-    detector.addEventListener('gesture-ended', handleGestureEnded);
-
-    return () => {
-      // Cleanup
-      detector.removeEventListener('gesture-ended', handleGestureEnded);
-    };
   },
 });
