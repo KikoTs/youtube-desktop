@@ -58,3 +58,13 @@ ytm-reel-shelf-renderer:has(.reel-shelf-title-wrapper .yt-core-attributed-string
 ytm-chip-cloud-chip-renderer:has(.yt-core-attributed-string:has-text(/^Shorts$/i)) {
     display: none;
 }
+// Shorts Blocker
+ytd-mini-guide-entry-renderer[aria-label="Shorts"],
+ytd-guide-entry-renderer[aria-label="Shorts"],
+ytd-reel-shelf-renderer,
+ytd-rich-shelf-renderer[is-shorts],
+ytd-reel-video-renderer,
+ytd-rich-grid-row[is-shorts],
+ytd-rich-section-renderer[is-shorts] {
+  display: none !important;
+}

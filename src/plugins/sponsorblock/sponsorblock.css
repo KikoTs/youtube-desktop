@@ -1,0 +1,12 @@
+#sponsor-bar {
+    display: flex;
+    position: absolute;
+    top: 0;
+    height: 4px;
+    width: 100%;
+    z-index: 10;
+    pointer-events: none;
+}
+#sponsor-bar div {
+    height: 100%;
+}
