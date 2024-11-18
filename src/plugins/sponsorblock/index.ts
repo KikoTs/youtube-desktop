@@ -21,8 +21,11 @@ export type SponsorBlockPluginConfig = {
     | 'music_offtopic'
   )[];
 };
-
-let currentSegments: Segment[] = [];
+export interface SegmentWithCategory {
+  segment: [number, number]; // Start and end times
+  category: string; // Category associated with the segment
+}
+let currentSegments: SegmentWithCategory[] = [];
 const sponsorBlockCss = `
 #sponsor-bar {
     display: flex;
@@ -59,11 +62,9 @@ export default createPlugin({
     const fetchSegments = async (
       apiURL: string,
       categories: string[],
-      videoId: string,
+      videoId: string
     ) => {
-      const sponsorBlockURL = `${apiURL}/api/skipSegments?videoID=${videoId}&categories=${JSON.stringify(
-        categories,
-      )}`;
+      const sponsorBlockURL = `${apiURL}/api/skipSegments?videoID=${videoId}&categories=${JSON.stringify(categories)}`;
       try {
         const resp = await fetch(sponsorBlockURL, {
           method: 'GET',
@@ -75,14 +76,24 @@ export default createPlugin({
         if (resp.status !== 200) {
           return [];
         }
-
+    
         const segments = (await resp.json()) as SkipSegment[];
-        return sortSegments(segments.map((submission) => submission.segment));
+    
+        // Log raw data for debugging
+        console.log(segments);
+    
+        // Map to an array of objects with both segment and category
+        return sortSegments(
+          segments.map((submission) => ({
+            segment: submission.segment, // [start, end]
+            category: submission.category, // e.g., 'sponsor', 'intro', etc.
+          }))
+        );
       } catch (error) {
         if (is.dev()) {
-          console.log('error on sponsorblock request:', error);
+          console.log('Error on SponsorBlock request:', error);
         }
-
+    
         return [];
       }
     };
@@ -102,52 +113,49 @@ export default createPlugin({
   },
   renderer: {
     timeUpdateListener: (e: Event) => {
-        if (e.target instanceof HTMLVideoElement) {
-            const target = e.target;
-
-            for (const segment of currentSegments) {
-                if (
-                    target.currentTime >= segment[0] &&
-                    target.currentTime < segment[1]
-                ) {
-                    target.currentTime = segment[1];
-                    if (window.electronIs.dev()) {
-                        console.log('SponsorBlock: skipping segment', segment);
-                    }
-                }
+      if (e.target instanceof HTMLVideoElement) {
+        const target = e.target;
+  
+        for (const { segment } of currentSegments) {
+          const [start, end] = segment;
+          if (target.currentTime >= start && target.currentTime < end) {
+            target.currentTime = end;
+            if (window.electronIs.dev()) {
+              console.log('SponsorBlock: skipping segment', segment);
             }
+          }
         }
+      }
     },
     resetSegments: () => {
-        currentSegments = [];
+      currentSegments = [];
+      this.updateProgressBar();
+    },
+    start: function ({ ipc }) {
+      ipc.on('sponsorblock-skip', (segments: SegmentWithCategory[]) => {
+        currentSegments = segments;
         this.updateProgressBar();
+      });
     },
-    start({ ipc }) {
-      
-        ipc.on('sponsorblock-skip', (segments: Segment[]) => {
-            currentSegments = segments;
-            this.updateProgressBar();
-        });
+    onPlayerApiReady: function () {
+      const video = document.querySelector<HTMLVideoElement>('video');
+      if (!video) return;
+  
+      video.addEventListener('timeupdate', this.timeUpdateListener);
+      video.addEventListener('emptied', this.resetSegments);
+  
+      this.addProgressBar();
     },
-    onPlayerApiReady() {
-        const video = document.querySelector<HTMLVideoElement>('video');
-        if (!video) return;
-
-        video.addEventListener('timeupdate', this.timeUpdateListener);
-        video.addEventListener('emptied', this.resetSegments);
-
-        this.addProgressBar();
+    stop: function () {
+      const video = document.querySelector<HTMLVideoElement>('video');
+      if (!video) return;
+  
+      video.removeEventListener('timeupdate', this.timeUpdateListener);
+      video.removeEventListener('emptied', this.resetSegments);
+  
+      this.removeProgressBar();
     },
-    stop() {
-        const video = document.querySelector<HTMLVideoElement>('video');
-        if (!video) return;
-
-        video.removeEventListener('timeupdate', this.timeUpdateListener);
-        video.removeEventListener('emptied', this.resetSegments);
-
-        this.removeProgressBar();
-    },
-    addProgressBar() {
+    addProgressBar: function () {
       const progressContainer = document.querySelector('.ytp-progress-bar-container');
       if (!progressContainer) return;
   
@@ -163,8 +171,8 @@ export default createPlugin({
   
       progressContainer.appendChild(sponsorBar);
       this.updateProgressBar();
-  },
-  updateProgressBar() {
+    },
+    updateProgressBar: function () {
       const sponsorBar = document.getElementById('sponsor-bar');
       if (!sponsorBar || !currentSegments.length) return;
   
@@ -174,42 +182,43 @@ export default createPlugin({
       if (!video) return;
   
       const duration = video.duration;
-      console.log(currentSegments[index]);
-      currentSegments.forEach(([start, end], index) => {
-          const segmentDiv = document.createElement('div');
-          segmentDiv.style.flexGrow = '0';
-          segmentDiv.style.flexShrink = '0';
-          segmentDiv.style.position = 'absolute';
-          segmentDiv.style.left = this.timeToPercentage(start, duration);
-          segmentDiv.style.width = this.timeToPercentage(end - start, duration);
-          segmentDiv.style.height = '100%';
   
-          // Assign a color based on the category
-          const category = currentSegments[index].category || 'sponsor';
-          segmentDiv.style.backgroundColor = this.getCategoryColor(category);
+      currentSegments.forEach(({ segment, category }) => {
+        const [start, end] = segment;
   
-          sponsorBar.appendChild(segmentDiv);
+        const segmentDiv = document.createElement('div');
+        segmentDiv.style.flexGrow = '0';
+        segmentDiv.style.flexShrink = '0';
+        segmentDiv.style.position = 'absolute';
+        segmentDiv.style.left = this.timeToPercentage(start, duration);
+        segmentDiv.style.width = this.timeToPercentage(end - start, duration);
+        segmentDiv.style.height = '100%';
+  
+        // Assign color based on the category
+        segmentDiv.style.backgroundColor = this.getCategoryColor(category);
+  
+        sponsorBar.appendChild(segmentDiv);
       });
-  },
-  timeToPercentage(time: number, duration: number): string {
+    },
+    timeToPercentage: (time: number, duration: number): string => {
       return `${(time / duration) * 100}%`;
-  },
-    getCategoryColor(category: string): string {
-        const colors = {
-            sponsor: 'rgba(0, 212, 0, 0.5)',
-            intro: 'rgba(0, 255, 255, 0.5)',
-            outro: 'rgba(0, 0, 255, 0.5)',
-            interaction: 'rgba(204, 0, 255, 0.5)',
-            selfpromo: 'rgba(255, 255, 0, 0.5)',
-            music_offtopic: 'rgba(255, 153, 0, 0.5)',
-        };
-        return colors[category] || 'rgba(0, 0, 0, 0.5)';
     },
-    removeProgressBar() {
-        const sponsorBar = document.getElementById('sponsor-bar');
-        if (sponsorBar) {
-            sponsorBar.remove();
-        }
+    getCategoryColor: (category: string): string => {
+      const colors = {
+        sponsor: 'rgba(0, 212, 0, 1)',
+        intro: 'rgba(0, 255, 255, 1)',
+        outro: 'rgba(0, 0, 255, 1)',
+        interaction: 'rgba(204, 0, 255, 1)',
+        selfpromo: 'rgba(255, 255, 0, 1)',
+        music_offtopic: 'rgba(255, 153, 0, 1)',
+      };
+      return colors[category] || 'rgba(0, 0, 0, 1)';
     },
-}
+    removeProgressBar: function () {
+      const sponsorBar = document.getElementById('sponsor-bar');
+      if (sponsorBar) {
+        sponsorBar.remove();
+      }
+    },
+  }
 });
