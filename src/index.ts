@@ -393,7 +393,6 @@ async function createMainWindow() {
   });
   initHook(win);
   initTheme(win);
-
   await loadAllMainPlugins(win);
 
   if (windowPosition) {

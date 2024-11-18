@@ -23,7 +23,6 @@ import {
   setBadge,
 } from './utils';
 
-import { fetchFromGenius } from '@/plugins/lyrics-genius/main';
 import { isEnabled } from '@/config/plugins';
 import registerCallback, {
   cleanupName,
@@ -523,15 +522,6 @@ async function writeID3(
       };
     }
 
-    if (isEnabled('lyrics-genius')) {
-      const lyrics = await fetchFromGenius(metadata);
-      if (lyrics) {
-        tags.unsynchronisedLyrics = {
-          language: '',
-          text: lyrics,
-        };
-      }
-    }
 
     if (metadata.trackId) {
       tags.trackNumber = metadata.trackId;
