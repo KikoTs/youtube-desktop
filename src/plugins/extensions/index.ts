@@ -1,95 +1,77 @@
-import fs from 'fs';
-import path from 'path';
-import { app, shell, session } from 'electron';
 
+import { shell, session } from 'electron';
 import { createPlugin } from '@/utils';
-
-import { t } from '@/i18n';
-
+import { installExtension } from './extensions-installer';
+import { getLocalExtensions, getRemoteExtensions } from './extensions';
+import path from 'path';
 import type { BrowserWindow } from 'electron';
 
 interface ExtensionsConfig {
-  /**
-   * Whether to enable the extensions.
-   * @default true
-   */
   enabled: boolean;
 }
 
 
 
 export default createPlugin({
-    name: () => t('plugins.extensions.name'),
-    description: () => t('plugins.extensions.description'),
-    restartNeeded: true,
-    config: {
-      enabled: true,
-    } as ExtensionsConfig,
-    menu: async ({ getConfig, setConfig }) => {
-      const config = await getConfig();
-  
-      const extensionDirectory = path.join(app.getPath('userData'), 'Extensions');
-      if (!fs.existsSync(extensionDirectory)) {
-        fs.mkdirSync(extensionDirectory);
-      }
-  
-      // Read all directories (extensions)
-      const directories = fs
-        .readdirSync(extensionDirectory, { withFileTypes: true })
-        .filter((dir) => dir.isDirectory())
-        .map((dir) => dir.name);
-  
-      return [
-        {
-          label: t('plugins.extensions.menu.openFolder'),
+  name: () => 'Extensions',
+  description: () => 'Load custom extensions from the Extensions folder',
+  restartNeeded: true,
+  config: {
+    enabled: true,
+  } as ExtensionsConfig,
+  menu: async ({ setConfig }) => {
+    const { extensionDirectory, directories } = getLocalExtensions();
+    const { extensionsList } = getRemoteExtensions();
+
+    return [
+      {
+        label: 'Open Extensions Folder',
+        click: () => {
+          shell.openPath(extensionDirectory);
+        },
+      },
+      {
+        label: 'Active Extensions',
+        submenu: directories.map((dir) => ({
+          label: dir,
           click: () => {
-            shell.openPath(extensionDirectory);
+            console.log(`Open settings for extension: ${dir}`);
           },
-        },
-        {
-          label: t('plugins.extensions.menu.activeExtensions'),
-          submenu: directories.map((dir) => ({
-            label: dir,
-            click: () => {
-              // Implement opening extension settings
-              console.log(`Open settings for extension: ${dir}`);
-              shell.openPath(path.join(extensionDirectory, dir));
-            },
-          })),
-        },
-      ];
-    },
-    backend: {
-      mainWindow: null as BrowserWindow | null,
-      async start({ getConfig, window }) {
-        // const config = await getConfig();
-        // this.mainWindow = window;
-  
-        const extensionDirectory = path.join(app.getPath('userData'), 'Extensions');
-        if (!fs.existsSync(extensionDirectory)) {
-          fs.mkdirSync(extensionDirectory);
+        })),
+      },
+      {
+        label: 'Install Extension',
+        submenu: extensionsList.filter(ext => !directories.includes(ext.name)).map((ext) => ({
+          label: ext.name,
+          click: async () => {
+            await installExtension(ext);
+            await setConfig({ enabled: true });
+          },
+        })),
+      },
+    ];
+  },
+  backend: {
+    mainWindow: null as BrowserWindow | null,
+    async start() {
+      const { extensionDirectory, directories } = getLocalExtensions();
+
+      for (const dir of directories) {
+        const extensionPath = path.join(extensionDirectory, dir);
+        try {
+          const extension = await session.defaultSession.loadExtension(extensionPath);
+          extension.id;
+          console.log(`Loaded extension: ${extensionPath}`);
+        } catch (error) {
+          console.error(`Failed to load extension at ${extensionPath}:`, error);
         }
-  
-        // Load extensions from each folder in the Extensions directory
-        const directories = fs.readdirSync(extensionDirectory, { withFileTypes: true });
-        for (const dir of directories) {
-          if (dir.isDirectory()) {
-            const extensionPath = path.join(extensionDirectory, dir.name);
-            try {
-              const extension = await session.defaultSession.loadExtension(extensionPath);
-              extension.id; // use the extension id to interact with it
-              console.log(`Loaded extension: ${extensionPath}`);
-            } catch (error) {
-              console.error(`Failed to load extension at ${extensionPath}:`, error);
-            }
-          }
-        }
-      },
-      stop({ window }) {
-        console.log('Stopping the plugin...');
-      },
-      async onConfigChange(newConfig) {
-        console.log('Configuration changed:', newConfig);
-      },
+      }
     },
-  });
+    stop() {
+      console.log('Stopping the plugin...');
+    },
+    async onConfigChange(newConfig) {
+      console.log('Configuration changed:', newConfig);
+    },
+  },
+});

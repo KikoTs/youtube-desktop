@@ -245,6 +245,7 @@
     "electron-store": "10.0.0",
     "electron-unhandled": "4.0.1",
     "electron-updater": "6.3.9",
+    "extract-zip": "^2.0.1",
     "fast-average-color": "9.4.0",
     "fast-equals": "5.0.1",
     "filenamify": "6.0.0",
