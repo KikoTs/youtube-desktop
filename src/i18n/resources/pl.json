@@ -279,6 +279,13 @@
       },
       "name": "Tryb otoczenia"
     },
+    "amuse": {
+      "description": "Wspiera integrację YouTube Music z widgetami Amuse (od 6K Labs)",
+      "name": "Amuse",
+      "response": {
+        "query": "Serwer API Amuse działa. Użyj metody GET do /query, aby zdobyć informację o utworze."
+      }
+    },
     "api-server": {
       "description": "Pozwala na kontrolowanie YouTube Music poprzez podłączenie specjalnego serwera API",
       "dialog": {
@@ -357,7 +364,7 @@
       "name": "Kompaktowy pasek boczny"
     },
     "crossfade": {
-      "description": "Przenikanie pomiędzy utworami",
+      "description": "Pozwól odtwarzaczowi płynnie przechodzić między utworami",
       "menu": {
         "advanced": "Zaawansowane"
       },
@@ -483,6 +490,18 @@
       "templates": {
         "button": "Pobierz"
       }
+    },
+    "equalizer": {
+      "description": "Dodaje equalizer do odtwarzacza",
+      "menu": {
+        "presets": {
+          "label": "Presety",
+          "list": {
+            "bass-booster": "Wzmacniacz basu"
+          }
+        }
+      },
+      "name": "Korektor"
     },
     "exponential-volume": {
       "description": "Sprawia, że suwak głośności jest proporcjonalna, dzięki czemu łatwiej jest wybrać niższą głośność.",
@@ -664,6 +683,7 @@
         "listenbrainz": {
           "token": "Podaj token użytkownika ListenBrainz"
         },
+        "scrobble-alternative-title": "Użyj alternatywnych tytułów",
         "scrobble-other-media": "Scrobbluj pozostałe multimedia"
       },
       "name": "Scrobblowanie",
@@ -714,8 +734,8 @@
     "synced-lyrics": {
       "description": "Dodaje zsynchronizowane napisy do utworów używając między innymi LRClib.",
       "errors": {
-        "fetch": "⚠️ - Wystąpił błąd podczas pobierania tekstu utworu. Spróbuj ponownie później.",
-        "not-found": "⚠️ - Nie znaleziono napisów dla tego utworu."
+        "fetch": "⚠️\tWystąpił błąd podczas pobierania tekstu utworu.\n\tSpróbuj ponownie później.",
+        "not-found": "⚠️ Nie znaleziono napisów dla tego utworu."
       },
       "menu": {
         "default-text-string": {
@@ -725,6 +745,10 @@
         "line-effect": {
           "label": "Efekty linijki",
           "submenu": {
+            "fancy": {
+              "label": "Facy",
+              "tooltip": "Użyj specjalnych efektów w stylu aplikacji na obecną linię"
+            },
             "focus": {
               "label": "Fokus",
               "tooltip": "Spraw, aby tylko obecna linijka była biała"
@@ -743,6 +767,10 @@
         "precise-timing": {
           "label": "Zsynchronizuj tekst utworu do perfekcji",
           "tooltip": "Wylicz czas wyświetlania następnej linijki co do milisekundy (może mieć mały wpływ na wydajność systemu)"
+        },
+        "romanization": {
+          "label": "Romanizacja utworów",
+          "tooltip": "Jeżeli tekst piosenki nie jest w alfabecie łacińskim, poddaje ją romanizacji, czyli przedstawia mowy za pomocą owych liter."
         },
         "show-lyrics-even-if-inexact": {
           "label": "Pokaż teksty, mimo niezgodności",
@@ -775,6 +803,10 @@
     "tuna-obs": {
       "description": "Integracja z wtyczką OBS Tuna",
       "name": "Tuna OBS"
+    },
+    "unobtrusive-player": {
+      "description": "Zapobiega wyświetlaniu się ekranu z utworem po wybraniu innego tytułu",
+      "name": "Niewidoczny odtwarzacz"
     },
     "video-toggle": {
       "description": "Dodaje przycisk do przełączania między trybem wideo a piosenki. Może również opcjonalnie usunąć całą kartę wideo",

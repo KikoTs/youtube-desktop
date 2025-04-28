@@ -283,6 +283,13 @@
       },
       "name": "Ambient Mode"
     },
+    "amuse": {
+      "description": "Adds YouTube Music support for the Amuse now playing widget by 6K Labs",
+      "name": "Amuse",
+      "response": {
+        "query": "Amuse API server is running. GET /query to get song info."
+      }
+    },
     "api-server": {
       "description": "Adds an API server to control the player",
       "dialog": {
@@ -585,6 +592,10 @@
       },
       "name": "Notifications"
     },
+    "performance-improvement": {
+      "description": "Improve performance by enabling dangerous scripts",
+      "name": "Performance improvement [Beta]"
+    },
     "picture-in-picture": {
       "description": "Allows to switch the app to picture-in-picture mode",
       "menu": {
@@ -668,7 +679,8 @@
         "listenbrainz": {
           "token": "Enter ListenBrainz user token"
         },
-        "scrobble-other-media": "Scrobble other media"
+        "scrobble-other-media": "Scrobble other media",
+        "scrobble-alternative-title": "Use alternative titles"
       },
       "name": "Scrobbler",
       "prompt": {
@@ -718,8 +730,8 @@
     "synced-lyrics": {
       "description": "Provides synced lyrics to songs, using providers like LRClib.",
       "errors": {
-        "fetch": "⚠️ - An error occurred while fetching the lyrics. Please try again later.",
-        "not-found": "⚠️ - No lyrics found for this song."
+        "fetch": "⚠️\tAn error occurred while fetching the lyrics.\n\tPlease try again later.",
+        "not-found": "⚠️ No lyrics found for this song."
       },
       "menu": {
         "default-text-string": {
@@ -729,6 +741,10 @@
         "line-effect": {
           "label": "Line effect",
           "submenu": {
+            "fancy": {
+              "label": "Fancy",
+              "tooltip": "Use large, app-like effects on the current line"
+            },
             "focus": {
               "label": "Focus",
               "tooltip": "Make only the current line white"
@@ -747,6 +763,10 @@
         "precise-timing": {
           "label": "Make the lyrics perfectly synced",
           "tooltip": "Calculate to the milisecond the display of the next line (can have a small impact on performance)"
+        },
+        "romanization": {
+          "label": "Romanize lyrics",
+          "tooltip": "If the lyrics are in a different language, try to display a latin version."
         },
         "show-lyrics-even-if-inexact": {
           "label": "Show lyrics even if inexact",
@@ -780,6 +800,10 @@
       "description": "Integration with OBS's plugin Tuna",
       "name": "Tuna OBS"
     },
+    "unobtrusive-player": {
+      "description": "Prevents the player from popping up when playing a song",
+      "name": "Unobtrusive Player"
+    },
     "video-toggle": {
       "description": "Adds a button to switch between Video/Song mode. can also optionally remove the whole video tab",
       "menu": {
@@ -812,6 +836,18 @@
         "visualizer-type": "Visualizer Type"
       },
       "name": "Visualizer"
+    },
+    "equalizer": {
+      "description": "Adds an equalizer to the player",
+      "name": "Equalizer",
+      "menu": {
+        "presets": {
+          "label": "Presets",
+          "list": {
+            "bass-booster": "Bass booster"
+          }
+        }
+      }
     }
   }
 }

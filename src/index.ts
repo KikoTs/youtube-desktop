@@ -131,13 +131,8 @@ if (config.get('options.disableHardwareAcceleration')) {
 }
 
 if (is.linux()) {
-  // Workaround for issue #2248
-  if (
-    process.env.XDG_SESSION_TYPE === 'wayland' ||
-    process.env.WAYLAND_DISPLAY
-  ) {
-    app.commandLine.appendSwitch('disable-gpu-memory-buffer-video-frames');
-  }
+  // Overrides WM_CLASS for X11 to correspond to icon filename
+  app.setName('com.github.th_ch.youtube_music');
 
   // Stops chromium from launching its own MPRIS service
   if (config.plugins.isEnabled('shortcuts')) {
@@ -539,10 +534,11 @@ app.once('browser-window-created', (_event, win) => {
     // User agents are from https://developers.whatismybrowser.com/useragents/explore/
     const originalUserAgent = win.webContents.userAgent;
     const userAgents = {
-      mac: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12.1; rv:95.0) Gecko/20100101 Firefox/95.0',
+      mac: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.152 Safari/537.36',
       windows:
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:95.0) Gecko/20100101 Firefox/95.0',
-      linux: 'Mozilla/5.0 (Linux x86_64; rv:95.0) Gecko/20100101 Firefox/95.0',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.152 Safari/537.36',
+      linux:
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.152 Safari/537.36',
     };
 
     const updatedUserAgent = is.macOS()
@@ -877,7 +873,7 @@ app.whenReady().then(async () => {
 
   // Optimized for Mac OS X
   if (is.macOS() && !config.get('options.appVisible')) {
-    app.dock.hide();
+    app.dock?.hide();
   }
 
   let forceQuit = false;
@@ -949,9 +945,21 @@ function removeContentSecurityPolicy(
   betterSession.webRequest.onHeadersReceived((details, callback) => {
     details.responseHeaders ??= {};
 
-    // Remove the content security policy
-    delete details.responseHeaders['content-security-policy-report-only'];
-    delete details.responseHeaders['content-security-policy'];
+    // prettier-ignore
+    if (new URL(details.url).protocol === 'https:') {
+      // Remove the content security policy
+      delete details.responseHeaders['content-security-policy-report-only'];
+      delete details.responseHeaders['Content-Security-Policy-Report-Only'];
+      delete details.responseHeaders['content-security-policy'];
+      delete details.responseHeaders['Content-Security-Policy'];
+
+      if (
+        !details.responseHeaders['access-control-allow-origin'] &&
+        !details.responseHeaders['Access-Control-Allow-Origin']
+      ) {
+        details.responseHeaders['access-control-allow-origin'] = ['https://music.youtube.com'];
+      }
+    }
 
     callback({ cancel: false, responseHeaders: details.responseHeaders });
   });

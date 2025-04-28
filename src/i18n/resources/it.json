@@ -160,10 +160,10 @@
               "theme": {
                 "dialog": {
                   "button": {
-                    "cancel": "Cancella",
+                    "cancel": "Annulla",
                     "remove": "Rimuovi"
                   },
-                  "remove-theme": "Sicuro di voler rimuovere il tema personalizzato?",
+                  "remove-theme": "Sei sicuro di voler rimuovere il tema personalizzato?",
                   "remove-theme-message": "Questo rimuoverà il tema personalizzato"
                 },
                 "label": "Tema",
@@ -278,6 +278,13 @@
         }
       },
       "name": "Modalità Ambiente"
+    },
+    "amuse": {
+      "description": "Aggiunge il supporto a YouTube Music per il widget Amuse Now Playing di 6K Labs",
+      "name": "Amuse",
+      "response": {
+        "query": "Il server API di Amuse è in funzione. GET /query per ottenere informazioni sui brani."
+      }
     },
     "api-server": {
       "description": "Aggiunge un server API per controllare il player",
@@ -484,6 +491,18 @@
         "button": "Scarica"
       }
     },
+    "equalizer": {
+      "description": "Aggiunge un equalizzatore al player",
+      "menu": {
+        "presets": {
+          "label": "Preset",
+          "list": {
+            "bass-booster": "Booster dei bassi"
+          }
+        }
+      },
+      "name": "Equalizzatore"
+    },
     "exponential-volume": {
       "description": "Rende esponenziale il cursore del volume, in modo da facilitare la selezione di volumi più bassi.",
       "name": "Volume esponenziale"
@@ -581,6 +600,10 @@
       },
       "name": "Notifiche"
     },
+    "performance-improvement": {
+      "description": "Migliora le prestazioni abilitando script non sicuri",
+      "name": "Miglioramento prestazioni [Beta]"
+    },
     "picture-in-picture": {
       "description": "Consente di far passare l'app alla modalità Picture-in-Picture",
       "menu": {
@@ -664,6 +687,7 @@
         "listenbrainz": {
           "token": "Inserire il token utente per ListenBrainz"
         },
+        "scrobble-alternative-title": "Usa titoli alternativi",
         "scrobble-other-media": "Scrobble altri media"
       },
       "name": "Scrobbler",
@@ -714,8 +738,8 @@
     "synced-lyrics": {
       "description": "Fornisce testi sincronizzati alle canzoni, utilizzando provider come LRClib.",
       "errors": {
-        "fetch": "⚠️ - Si è verificato un errore nel recuperare il testo. Per favore riprova più tardi.",
-        "not-found": "⚠️ - Nessun testo trovato per questa canzone."
+        "fetch": "⚠️ \tSi è verificato un errore nel recuperare il testo.\n\tPer favore riprova più tardi.",
+        "not-found": "⚠️ Nessun testo trovato per questa canzone."
       },
       "menu": {
         "default-text-string": {
@@ -725,6 +749,9 @@
         "line-effect": {
           "label": "Effetto linea",
           "submenu": {
+            "fancy": {
+              "tooltip": "Usa effetti grandi, simili a quelli di un'app sulla riga attuale"
+            },
             "focus": {
               "label": "Focus",
               "tooltip": "Rendi bianca solo la riga corrente"
@@ -743,6 +770,10 @@
         "precise-timing": {
           "label": "Rendi i testi perfettamente sincronizzati",
           "tooltip": "Calcola al millisecondo la visualizzazione della riga successiva (può avere un piccolo impatto sulle prestazioni)"
+        },
+        "romanization": {
+          "label": "Testi in caratteri occidentali",
+          "tooltip": "Qualora il testo fosse scritto in una lingua non occidentale, prova a visualizzarlo in caratteri latini."
         },
         "show-lyrics-even-if-inexact": {
           "label": "Mostra le lyric anche se incorrette",
@@ -775,6 +806,10 @@
     "tuna-obs": {
       "description": "Integrazione con il plugin OBS Tuna",
       "name": "Tuna OBS"
+    },
+    "unobtrusive-player": {
+      "description": "Evita che il player si apra automaticamente durante la riproduzione di un brano",
+      "name": "Player Discreto"
     },
     "video-toggle": {
       "description": "Aggiunge un pulsante per passare dalla modalità Video a quella Brano. Può anche rimuovere l'intera scheda Brano/Video",

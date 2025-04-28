@@ -48,7 +48,7 @@ export class ListenbrainzScrobbler extends ScrobblerBase {
       return;
     }
 
-    const body = createRequestBody('playing_now', videoInfo);
+    const body = createRequestBody('playing_now', videoInfo, config);
     submitListen(body, config);
   }
 
@@ -64,7 +64,7 @@ export class ListenbrainzScrobbler extends ScrobblerBase {
       return;
     }
 
-    const body = createRequestBody('single', videoInfo);
+    const body = createRequestBody('single', videoInfo, config);
     body.payload[0].listened_at = Math.trunc(Date.now() / 1000);
 
     submitListen(body, config);
@@ -74,7 +74,10 @@ export class ListenbrainzScrobbler extends ScrobblerBase {
 function createRequestBody(
   listenType: string,
   videoInfo: VideoInfo,
+  config: ScrobblerPluginConfig,
 ): ListenbrainzRequestBody {
+  const title = videoInfo.title;
+
   const trackMetadata = {
     artist_name: videoInfo.author,
     track_name: videoInfo.title,

@@ -279,6 +279,13 @@
       },
       "name": "沉浸模式"
     },
+    "amuse": {
+      "description": "为 6K Labs 的 Amuse 正在播放小部件添加 YouTube Music 支持",
+      "name": "Amuse",
+      "response": {
+        "query": "Amuse API服务器已在运行。使用 /query 以获取歌曲信息。"
+      }
+    },
     "api-server": {
       "description": "添加一个 API 服务器来控制播放器",
       "dialog": {
@@ -484,6 +491,18 @@
         "button": "下载"
       }
     },
+    "equalizer": {
+      "description": "为播放器添加均衡器",
+      "menu": {
+        "presets": {
+          "label": "预设",
+          "list": {
+            "bass-booster": "低音增强器"
+          }
+        }
+      },
+      "name": "均衡器"
+    },
     "exponential-volume": {
       "description": "让音量滑块指数化以便选择更低的音量。",
       "name": "指数化音量"
@@ -581,6 +600,10 @@
       },
       "name": "通知"
     },
+    "performance-improvement": {
+      "description": "通过开启危险脚本改进性能",
+      "name": "性能改进 [公测]"
+    },
     "picture-in-picture": {
       "description": "允许应用切换到画中画模式",
       "menu": {
@@ -664,6 +687,7 @@
         "listenbrainz": {
           "token": "输入 ListenBrainz 用户令牌"
         },
+        "scrobble-alternative-title": "使用替代标题",
         "scrobble-other-media": "记录其他媒体文件"
       },
       "name": "歌曲记录器",
@@ -714,8 +738,8 @@
     "synced-lyrics": {
       "description": "透过 LRClib 等服务提供滚动歌词显示。",
       "errors": {
-        "fetch": "⚠️ - 获取歌词时发生错误。请稍后再试。",
-        "not-found": "⚠️ - 未找到此歌曲的歌词。"
+        "fetch": "⚠️ 获取歌词时发生错误。\n 请稍后再试。",
+        "not-found": "⚠️ 未找到此歌曲的歌词。"
       },
       "menu": {
         "default-text-string": {
@@ -725,6 +749,10 @@
         "line-effect": {
           "label": "歌词行特效",
           "submenu": {
+            "fancy": {
+              "label": "Fancy",
+              "tooltip": "在当前行上使用大的、类似应用的效果"
+            },
             "focus": {
               "label": "高亮",
               "tooltip": "仅将当前歌词行显示为白色"
@@ -743,6 +771,10 @@
         "precise-timing": {
           "label": "让滚动歌词完全同步",
           "tooltip": "以毫秒精度估算下句歌词的显示时间（可能对性能有小幅影响）"
+        },
+        "romanization": {
+          "label": "将歌词罗马化",
+          "tooltip": "如果歌词以不同语言显示，试着展示拉丁字母版本。"
         },
         "show-lyrics-even-if-inexact": {
           "label": "即使时值不精确依然显示歌词",
@@ -775,6 +807,10 @@
     "tuna-obs": {
       "description": "与 OBS 的 Tuna 插件集成",
       "name": "Tuna OBS"
+    },
+    "unobtrusive-player": {
+      "description": "防止播放器在播放歌曲时弹出",
+      "name": "非侵扰式播放器"
     },
     "video-toggle": {
       "description": "增加视频/音频模式间的切换按钮。兼具移除整个视频页面的功能",

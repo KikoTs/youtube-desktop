@@ -77,7 +77,7 @@ function setupMPRIS() {
 
   instance.canRaise = true;
   instance.canQuit = false;
-  instance.canSetFullscreen = true;
+  instance.canUsePlayerControls = true;
   instance.supportedUriSchemes = ['http', 'https'];
   instance.desktopEntry = 'youtube-desktop';
   return instance;
@@ -93,6 +93,7 @@ function registerMPRIS(win: BrowserWindow) {
     shuffle,
     switchRepeat,
     setFullscreen,
+    requestShuffleInformation,
     requestFullscreenInformation,
     requestQueueInformation,
   } = videoControls;
@@ -126,8 +127,10 @@ function registerMPRIS(win: BrowserWindow) {
       win.webContents.send('ytd:setup-time-changed-listener', 'mpris');
       win.webContents.send('ytd:setup-repeat-changed-listener', 'mpris');
       win.webContents.send('ytd:setup-volume-changed-listener', 'mpris');
+      win.webContents.send('ytd:setup-shuffle-changed-listener', 'mpris');
       win.webContents.send('ytd:setup-fullscreen-changed-listener', 'mpris');
       win.webContents.send('ytd:setup-autoplay-changed-listener', 'mpris');
+      requestShuffleInformation();
       requestFullscreenInformation();
       requestQueueInformation();
     });
@@ -156,8 +159,16 @@ function registerMPRIS(win: BrowserWindow) {
       requestQueueInformation();
     });
 
+    ipcMain.on('ytd:shuffle-changed', (_, shuffleEnabled: boolean) => {
+      if (player.shuffle === undefined || !player.canUsePlayerControls) {
+        return;
+      }
+
+      player.shuffle = shuffleEnabled ?? !player.shuffle;
+    });
+
     ipcMain.on('ytd:fullscreen-changed', (_, changedTo: boolean) => {
-      if (player.fullscreen === undefined || !player.canSetFullscreen) {
+      if (player.fullscreen === undefined || !player.canUsePlayerControls) {
         return;
       }
 
@@ -168,7 +179,7 @@ function registerMPRIS(win: BrowserWindow) {
     ipcMain.on(
       'ytd:set-fullscreen',
       (_, isFullscreen: boolean | undefined) => {
-        if (!player.canSetFullscreen || isFullscreen === undefined) {
+        if (!player.canUsePlayerControls || isFullscreen === undefined) {
           return;
         }
 
@@ -179,7 +190,7 @@ function registerMPRIS(win: BrowserWindow) {
     ipcMain.on(
       'ytd:fullscreen-changed-supported',
       (_, isFullscreenSupported: boolean) => {
-        player.canSetFullscreen = isFullscreenSupported;
+        player.canUsePlayerControls = isFullscreenSupported;
       },
     );
     ipcMain.on('ytd:autoplay-changed', (_) => {
@@ -272,6 +283,12 @@ function registerMPRIS(win: BrowserWindow) {
     player.on('position', seekTo);
 
     player.on('shuffle', (enableShuffle) => {
+      if (!player.canUsePlayerControls || enableShuffle === undefined) {
+        return;
+      }
+
+      player.shuffle = enableShuffle;
+
       if (enableShuffle) {
         shuffle();
         requestQueueInformation();
@@ -288,31 +305,14 @@ function registerMPRIS(win: BrowserWindow) {
       console.trace(error);
     });
 
-    let mprisVolNewer = false;
-    let autoUpdate = false;
     ipcMain.on('ytd:volume-changed', (_, newVol) => {
-      if (~~(player.volume * 100) !== newVol) {
-        if (mprisVolNewer) {
-          mprisVolNewer = false;
-          autoUpdate = false;
-        } else {
-          autoUpdate = true;
-          player.volume = Number.parseFloat((newVol / 100).toFixed(2));
-          mprisVolNewer = false;
-          autoUpdate = false;
-        }
-      }
+      player.volume = Number.parseFloat((newVol / 100).toFixed(2));
     });
 
     player.on('volume', (newVolume: number) => {
       if (config.plugins.isEnabled('precise-volume')) {
         // With precise volume we can set the volume to the exact value.
-        const newVol = ~~(newVolume * 100);
-        if (~~(player.volume * 100) !== newVol && !autoUpdate) {
-          mprisVolNewer = true;
-          autoUpdate = false;
-          win.webContents.send('setVolume', newVol);
-        }
+        win.webContents.send('setVolume', ~~(newVolume * 100));
       } else {
         setVolume(newVolume * 100);
       }
