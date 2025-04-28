@@ -127,11 +127,13 @@ export class LastFmScrobbler extends ScrobblerBase {
       await this.createSession(config, setConfig);
     }
 
+    const title = videoInfo.title;
+
     const postData: LastFmVideoData = {
-      track: videoInfo.title,
+      track: title,
       duration: videoInfo.videoDuration,
       artist: videoInfo.author,
-      // undefined, // Will be undefined if current song is a video
+      album: undefined, // Will be undefined if current song is a video
       api_key: config.scrobblers.lastfm.apiKey,
       sk: config.scrobblers.lastfm.sessionKey,
       format: 'json',

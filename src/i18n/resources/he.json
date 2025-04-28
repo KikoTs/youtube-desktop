@@ -53,6 +53,8 @@
           "later": "אחר כך",
           "restart-now": "מתחיל את התוכנה מחדש עכשיו"
         },
+        "detail": "\"{{pluginName}}\" מצריך אתחול",
+        "message": "\"{{pluginName}}\" דורש אתחול",
         "title": "נדרשת הפעלה מחדש"
       },
       "unresponsive": {
@@ -69,9 +71,10 @@
         "buttons": {
           "disable": "בטל עדכונים",
           "download": "הורדה",
-          "ok": "אוקי"
+          "ok": "אוקיי"
         },
-        "message": "גירסא חדשה זמינה כעת",
+        "detail": "גרסה חדשה זמינה, ניתן להוריד אותה ב-{{downloadLink}}",
+        "message": "גירסה חדשה זמינה כעת",
         "title": "קיים עדכון חדש"
       }
     },
@@ -83,8 +86,243 @@
           "copy-current-url": "העתק את כתובת ה-URL",
           "go-back": "חזור אחורה",
           "go-forward": "לך קדימה",
-          "quit": "יציאה"
+          "quit": "יציאה",
+          "restart": "הפעל מחדש את היישום"
         }
+      },
+      "options": {
+        "label": "אפשרויות",
+        "submenu": {
+          "advanced-options": {
+            "label": "אפשרויות מתקדמות",
+            "submenu": {
+              "auto-reset-app-cache": "אפס את מטמון האפליקציה כאשר האפליקציה מתחילה",
+              "disable-hardware-acceleration": "השבת האצת החומרה",
+              "edit-config-json": "ערוך את config.json",
+              "override-user-agent": "עוקף את סוכן המשתמש",
+              "restart-on-config-changes": "הפעל מחדש בשינויי תצורה",
+              "set-proxy": {
+                "label": "הגדר שרת proxy",
+                "prompt": {
+                  "label": "הזן כתובת פרוקסי: (להשאיר ריק כדי להשבית)",
+                  "placeholder": "דוגמה: SOCKS5://127.0.0.1:9999",
+                  "title": "הגדר שרת proxy"
+                }
+              },
+              "toggle-dev-tools": "שנה את מצב כלי המפתחים"
+            }
+          },
+          "always-on-top": "השאר מקדימה",
+          "auto-update": "עדכון אוטומטי",
+          "hide-menu": {
+            "dialog": {
+              "message": "התפריט יוסתר בהפעלה הבאה, השתמש ב-[Alt] כדי להציג אותו (או סמן את [`] אם אתה משתמש בתפריט בתוך האפליקציה)",
+              "title": "הסתר תפריט מופעל"
+            },
+            "label": "הסתר את התפריט"
+          },
+          "language": {
+            "dialog": {
+              "message": "השפה תשתנה לאחר הפעלת היישום מחדש",
+              "title": "השפה שונתה"
+            },
+            "label": "שפה",
+            "submenu": {
+              "to-help-translate": "רוצים לעזור לתרגם? לחץ כאן"
+            }
+          },
+          "resume-on-start": "המשך את השיר האחרון עם הפעלת האפליקציה",
+          "single-instance-lock": "נעילת מופע יחיד",
+          "start-at-login": "התחל בכניסה",
+          "starting-page": {
+            "label": "דף פתיחה",
+            "unset": "בטל"
+          },
+          "tray": {
+            "label": "מגש",
+            "submenu": {
+              "disabled": "מושבת",
+              "enabled-and-hide-app": "מופעל והסתר אפליקציה",
+              "enabled-and-show-app": "מופעל והמציג את האפליקציה",
+              "play-pause-on-click": "הפעל/השהה בלחיצה"
+            }
+          },
+          "visual-tweaks": {
+            "label": "תיקונים חזותיים",
+            "submenu": {
+              "like-buttons": {
+                "default": "ברירת מחדל",
+                "force-show": "הפעל בכוח",
+                "hide": "הסתר",
+                "label": "כפתורי לייק"
+              },
+              "remove-upgrade-button": "הסר לחצן שדרוג",
+              "theme": {
+                "dialog": {
+                  "button": {
+                    "cancel": "ביטול",
+                    "remove": "הסר"
+                  },
+                  "remove-theme": "האם אתה בטוח שברצונך להסיר את העיצוב המותאם אישית?",
+                  "remove-theme-message": "פעולה זו תסיר את ערכת הנושא המותאמת אישית"
+                },
+                "label": "ערכת נושא",
+                "submenu": {
+                  "import-css-file": "ייבא קובץ CSS מותאם אישית",
+                  "no-theme": "ללא ערכת נושא"
+                }
+              }
+            }
+          }
+        }
+      },
+      "plugins": {
+        "enabled": "מופעל",
+        "label": "פלאגינים",
+        "new": "חדש"
+      },
+      "view": {
+        "label": "מראה",
+        "submenu": {
+          "force-reload": "התחל מחדש בכוח",
+          "reload": "טען מחדש",
+          "reset-zoom": "גודל אמיתי",
+          "toggle-fullscreen": "מסך מלא",
+          "zoom-in": "התקרב",
+          "zoom-out": "התרחק"
+        }
+      }
+    },
+    "tray": {
+      "next": "הבא",
+      "play-pause": "נגן/הפסק",
+      "previous": "הקודם",
+      "quit": "יציאה",
+      "restart": "הפעל מחדש",
+      "show": "הראה חלון",
+      "tooltip": {
+        "default": "יוטיוב מיוזיק",
+        "with-song-info": "יוטיוב מיוזיק: {{artist}} - {{title}}"
+      }
+    }
+  },
+  "plugins": {
+    "ad-speedup": {
+      "description": "במקרה של פרסומת, הסאונד מושתק ומהירות הוידאו מוכפלת ב-16",
+      "name": "הגבר מהירות פרסומת"
+    },
+    "adblocker": {
+      "description": "חסום את כל המודעות והמעקב מחוץ לקופסה",
+      "menu": {
+        "blocker": "חוסם"
+      },
+      "name": "חוסם פרסומות"
+    },
+    "album-actions": {
+      "description": "מוסיף לחצני ביטול אהבתי, דיסלייק, 'אהבתי' ו'לא אהבתי' כדי להחיל זאת על כל השירים ברשימת השמעה או אלבום",
+      "name": "פעולות אלבום"
+    },
+    "album-color-theme": {
+      "description": "מחיל נושא דינמי ואפקטים חזותיים המבוססים על לוח הצבעים של האלבום",
+      "menu": {
+        "color-mix-ratio": {
+          "submenu": {
+            "percent": "{{ratio}}%"
+          }
+        }
+      },
+      "name": "ערכת נושא צבע אלבום"
+    },
+    "ambient-mode": {
+      "description": "מחיל אפקט תאורה על ידי הטלת צבעים עדינים מהסרטון, אל הרקע של המסך",
+      "menu": {
+        "blur-amount": {
+          "label": "כמות טשטוש",
+          "submenu": {
+            "pixels": "{{blurAmount}} פיקסלים"
+          }
+        },
+        "buffer": {
+          "submenu": {
+            "buffer": "{{buffer}}"
+          }
+        },
+        "opacity": {
+          "label": "אֲטִימוּת",
+          "submenu": {
+            "percent": "{{opacity}}%"
+          }
+        },
+        "quality": {
+          "label": "אֵיכוּת",
+          "submenu": {
+            "pixels": "{{quality}} פיקסלים"
+          }
+        },
+        "size": {
+          "label": "גוֹדֶל",
+          "submenu": {
+            "percent": "{{size}}%"
+          }
+        },
+        "smoothness-transition": {
+          "submenu": {
+            "during": "במהלך {{interpolationTime}} שניות"
+          }
+        },
+        "use-fullscreen": {
+          "label": "שימוש במסך מלא"
+        }
+      },
+      "name": "מצב אווירה"
+    },
+    "amuse": {
+      "description": "מוסיף תמיכה ב-YouTube Music עבור הווידג'ט של Amuse המתנגן כעת על ידי 6K Labs"
+    },
+    "discord": {
+      "menu": {
+        "hide-github-button": "הסתר את לחצן הקישור של GitHub",
+        "play-on-youtube-music": "הפעל ביוטיוב מיוזיק",
+        "set-inactivity-timeout": "הגדר פסק זמן לחוסר פעילות"
+      }
+    },
+    "downloader": {
+      "backend": {
+        "dialog": {
+          "error": {
+            "title": "שגיאה בהורדה!"
+          }
+        },
+        "feedback": {
+          "downloading": "מוריד…",
+          "loading": "בטְעִינָה…",
+          "playlist-has-only-one-song": "לפלייליסט יש רק פריט אחד, מוריד אותו ישירות",
+          "playlist-id-not-found": "לא נמצא מזהה ID פלייליסט",
+          "preparing-file": "מכין קובץ…",
+          "saving": "שומר…",
+          "trying-to-get-playlist-id": "מנסה להשיג מזהה פלייליסט: {{playlistId}}",
+          "video-id-not-found": "הסרטון לא נמצא"
+        }
+      },
+      "description": "מוריד MP3 / אודיו מקור ישירות מהממשק",
+      "menu": {
+        "choose-download-folder": "בחר תיקיית הורדה",
+        "download-finish-settings": {
+          "label": "הורדה בסיום",
+          "prompt": {
+            "last-percent": "אחרי x אחוזים",
+            "last-seconds": "נשארו x שניות",
+            "title": "הגדר מתי להוריד"
+          },
+          "submenu": {
+            "advanced": "מִתקַדֵם",
+            "enabled": "מופעל",
+            "percent": "אָחוּז",
+            "seconds": "שניות"
+          }
+        },
+        "presets": "הגדרות קבועות מראש",
+        "skip-existing": "דלג על קבצים קיימים"
       }
     }
   }

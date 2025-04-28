@@ -3,18 +3,15 @@ import { join } from 'node:path';
 import { randomBytes } from 'node:crypto';
 
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
-import {
-  ClientType,
-  Innertube,
-  UniversalCache,
-  Utils,
-  YTNodes,
-} from 'youtubei.js';
+import { Innertube, UniversalCache, Utils, YTNodes } from 'youtubei.js';
 import is from 'electron-is';
 import filenamify from 'filenamify';
 import { Mutex } from 'async-mutex';
 import { createFFmpeg } from '@ffmpeg.wasm/main';
 import NodeID3, { TagConstants } from 'node-id3';
+
+import { Window } from 'happy-dom';
+import { BG, type BgConfig } from 'bgutils-js';
 
 import {
   cropMaxWidth,
@@ -22,7 +19,6 @@ import {
   sendFeedback as sendFeedback_,
   setBadge,
 } from './utils';
-
 import { isEnabled } from '@/config/plugins';
 import registerCallback, {
   cleanupName,
@@ -31,21 +27,17 @@ import registerCallback, {
   VideoInfoEvent as SongInfoEvent,
 } from '@/providers/video-info';
 import { getNetFetchAsFetch } from '@/plugins/utils/main';
-
 import { t } from '@/i18n';
 
 import { DefaultPresetList, type Preset, YoutubeFormatList } from '../types';
 
 import type { DownloaderPluginConfig } from '../index';
-
 import type { BackendContext } from '@/types/contexts';
-
 import type { FormatOptions } from 'youtubei.js/dist/src/types/FormatUtils';
 import type PlayerErrorMessage from 'youtubei.js/dist/src/parser/classes/PlayerErrorMessage';
 import type { Playlist } from 'youtubei.js/dist/src/parser/ytmusic';
 import type { VideoInfo } from 'youtubei.js/dist/src/parser/youtube';
 import type TrackInfo from 'youtubei.js/dist/src/parser/ytmusic/TrackInfo';
-
 import type { GetPlayerResponse } from '@/types/get-player-response';
 
 type CustomSongInfo = SongInfo & { trackId?: string };
@@ -60,6 +52,29 @@ const ffmpegMutex = new Mutex();
 let yt: Innertube;
 let win: BrowserWindow;
 let playingUrl: string;
+
+const isYouTubeMusicPremium = async () => {
+  // If signed out, it is understood as non-premium
+  const isSignedIn = (await win.webContents.executeJavaScript(
+    '!!yt.config_.LOGGED_IN',
+  )) as boolean;
+
+  if (!isSignedIn) return false;
+
+  // If signed in, check if the upgrade button is present
+  const upgradeBtnIconPathData = (await win.webContents.executeJavaScript(
+    'document.querySelector(\'iron-iconset-svg[name="yt-sys-icons"] #youtube_music_monochrome\')?.firstChild?.getAttribute("d")?.substring(0, 15)',
+  )) as string | null;
+
+  // Fallback to non-premium if the icon is not found
+  if (!upgradeBtnIconPathData) return false;
+
+  const upgradeButton = `ytmusic-guide-entry-renderer:has(> tp-yt-paper-item > yt-icon path[d^="${upgradeBtnIconPathData}"])`;
+
+  return (await win.webContents.executeJavaScript(
+    `!document.querySelector('${upgradeButton}')`,
+  )) as boolean;
+};
 
 const sendError = (error: Error, source?: string) => {
   win.setProgressBar(-1); // Close progress bar
@@ -112,6 +127,66 @@ export const onMainLoad = async ({
     generate_session_locally: true,
     fetch: getNetFetchAsFetch(),
   });
+
+  const requestKey = 'O43z0dpjhgX20SCx4KAo';
+  const visitorData = yt.session.context.client.visitorData;
+
+  if (visitorData) {
+    const cleanUp = (context: Partial<typeof globalThis>) => {
+      delete context.window;
+      delete context.document;
+    };
+
+    try {
+      const [width, height] = win.getSize();
+      // emulate jsdom using linkedom
+      const window = new Window({
+        width,
+        height,
+        console,
+      });
+      const document = window.document;
+
+      Object.assign(globalThis, {
+        window,
+        document,
+      });
+
+      const bgConfig: BgConfig = {
+        fetch: getNetFetchAsFetch(),
+        globalObj: globalThis,
+        identifier: visitorData,
+        requestKey,
+      };
+
+      const bgChallenge = await BG.Challenge.create(bgConfig);
+      const interpreterJavascript =
+        bgChallenge?.interpreterJavascript
+          .privateDoNotAccessOrElseSafeScriptWrappedValue;
+
+      if (interpreterJavascript) {
+        // This is a workaround to run the interpreterJavascript code
+        // Maybe there is a better way to do this (e.g. https://github.com/Siubaak/sval ?)
+        // eslint-disable-next-line @typescript-eslint/no-implied-eval,@typescript-eslint/no-unsafe-call
+        new Function(interpreterJavascript)();
+
+        const poTokenResult = await BG.PoToken.generate({
+          program: bgChallenge.program,
+          globalName: bgChallenge.globalName,
+          bgConfig,
+        }).finally(() => {
+          cleanUp(globalThis);
+        });
+
+        yt.session.po_token = poTokenResult.poToken;
+      } else {
+        cleanUp(globalThis);
+      }
+    } catch {
+      cleanUp(globalThis);
+    }
+  }
+
   ipc.handle('download-song', (url: string) => downloadSong(url));
   ipc.on('ytd:video-src-changed', (data: GetPlayerResponse) => {
     const microformat = data.microformat.playerMicroformatRenderer
@@ -314,7 +389,7 @@ async function downloadSongUnsafe(
   }
 
   const downloadOptions: FormatOptions = {
-    type: 'audio', // Audio, video or video+audio
+    type: (await isYouTubeMusicPremium()) ? 'audio' : 'video+audio', // Audio, video or video+audio
     quality: 'best', // Best, bestefficiency, 144p, 240p, 480p, 720p and so on.
     format: 'any', // Media container format
   };
@@ -564,7 +639,12 @@ export async function downloadPlaylist(givenUrl?: string | URL) {
   try {
     playlist = await yt.music.getPlaylist(playlistId);
     if (playlist?.items) {
-      items.push(...playlist.items.as(YTNodes.MusicResponsiveListItem));
+      const filteredItems = playlist.items.filter(
+        (item): item is YTNodes.MusicResponsiveListItem =>
+          item instanceof YTNodes.MusicResponsiveListItem,
+      );
+
+      items.push(...filteredItems);
     }
   } catch (error: unknown) {
     sendError(
@@ -577,20 +657,17 @@ export async function downloadPlaylist(givenUrl?: string | URL) {
     return;
   }
 
-  if (
-    !playlist ||
-    !playlist.items ||
-    playlist.items.length === 0 ||
-    !playlist.header ||
-    !('title' in playlist.header)
-  ) {
+  if (!playlist || !playlist.items || playlist.items.length === 0) {
     sendError(
       new Error(t('plugins.downloader.backend.feedback.playlist-is-empty')),
     );
     return;
   }
 
-  const normalPlaylistTitle = playlist.header?.title?.text;
+  const normalPlaylistTitle =
+    playlist.header && 'title' in playlist.header
+      ? playlist.header?.title?.text
+      : undefined;
   const playlistTitle =
     normalPlaylistTitle ??
     playlist.page.contents_memo
@@ -602,9 +679,13 @@ export async function downloadPlaylist(givenUrl?: string | URL) {
 
   while (playlist.has_continuation) {
     playlist = await playlist.getContinuation();
-    if (playlist?.items) {
-      items.push(...playlist.items.as(YTNodes.MusicResponsiveListItem));
-    }
+
+    const filteredItems = playlist.items.filter(
+      (item): item is YTNodes.MusicResponsiveListItem =>
+        item instanceof YTNodes.MusicResponsiveListItem,
+    );
+
+    items.push(...filteredItems);
   }
 
   if (items.length === 1) {
@@ -762,13 +843,7 @@ const getMetadata = (info: TrackInfo): CustomSongInfo => ({
 
 // This is used to bypass age restrictions
 const getAndroidTvInfo = async (id: string): Promise<VideoInfo> => {
-  const innertube = await Innertube.create({
-    client_type: ClientType.TV_EMBEDDED,
-    generate_session_locally: true,
-    retrieve_player: true,
-    fetch: getNetFetchAsFetch(),
-  });
   // GetInfo 404s with the bypass, so we use getBasicInfo instead
   // that's fine as we only need the streaming data
-  return await innertube.getBasicInfo(id, 'TV_EMBEDDED');
+  return await yt.getBasicInfo(id, 'TV_EMBEDDED');
 };

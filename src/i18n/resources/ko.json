@@ -164,7 +164,7 @@
                     "remove": "제거"
                   },
                   "remove-theme": "사용자 정의 테마를 제거하시겠습니까?",
-                  "remove-theme-message": "사용자 정의 테마가 제거됩니다. 계속하시겠습니까?"
+                  "remove-theme-message": "사용자 정의 테마를 제거하시겠습니까?"
                 },
                 "label": "테마",
                 "submenu": {
@@ -278,6 +278,13 @@
         }
       },
       "name": "앰비언트 모드"
+    },
+    "amuse": {
+      "description": "6K Labs Amuse의 'now playing' 위젯에 YouTube Music 지원 추가",
+      "name": "Amuse",
+      "response": {
+        "query": "Amuse API 서버가 실행 중입니다. GET /query로 노래 정보를 가져오세요."
+      }
     },
     "api-server": {
       "description": "플레이어를 제어하기 위한 API 서버를 추가합니다",
@@ -484,6 +491,18 @@
         "button": "다운로드"
       }
     },
+    "equalizer": {
+      "description": "플레이어에 이퀄라이저를 추가합니다",
+      "menu": {
+        "presets": {
+          "label": "프리셋",
+          "list": {
+            "bass-booster": "베이스 부스터"
+          }
+        }
+      },
+      "name": "이퀄라이저"
+    },
     "exponential-volume": {
       "description": "음량 슬라이더를 지수적으로 만들어 더 낮은 음량을 쉽게 선택할 수 있도록 합니다.",
       "name": "지수 음량"
@@ -581,6 +600,10 @@
       },
       "name": "알림"
     },
+    "performance-improvement": {
+      "description": "위험한 스크립트를 활성화하여 성능을 개선합니다",
+      "name": "성능 개선 [베타]"
+    },
     "picture-in-picture": {
       "description": "앱을 PiP 모드로 전환할 수 있게 허용합니다",
       "menu": {
@@ -664,6 +687,7 @@
         "listenbrainz": {
           "token": "ListenBrainz 유저 토큰 입력"
         },
+        "scrobble-alternative-title": "대체 제목 사용하기",
         "scrobble-other-media": "다른 미디어 스크로블하기"
       },
       "name": "스크로블러",
@@ -714,8 +738,8 @@
     "synced-lyrics": {
       "description": "LRClib등의 가사 제공자에서 싱크 가사를 불러옵니다.",
       "errors": {
-        "fetch": "⚠️ - 가사를 불러오는 동안 오류가 발생했습니다. 나중에 다시 시도해 주세요.",
-        "not-found": "⚠️ - 이 노래의 가사를 찾을 수 없습니다."
+        "fetch": "⚠️\t가사를 불러오는 동안 오류가 발생했습니다.\n\t나중에 다시 시도해 주세요.",
+        "not-found": "⚠️ 이 노래의 가사를 찾을 수 없습니다."
       },
       "menu": {
         "default-text-string": {
@@ -725,6 +749,10 @@
         "line-effect": {
           "label": "줄 표시 효과",
           "submenu": {
+            "fancy": {
+              "label": "예쁘게",
+              "tooltip": "유튜브 뮤직 앱처럼 커다란 효과를 현재 라인에 사용합니다"
+            },
             "focus": {
               "label": "포커스",
               "tooltip": "현재 줄만 하얀색으로 표시"
@@ -743,6 +771,10 @@
         "precise-timing": {
           "label": "가사를 최대한 정교하게 동기화",
           "tooltip": "다음 줄의 표시를 밀리초 단위로 계산합니다 (성능에 약간의 영향을 미칠 수 있음)"
+        },
+        "romanization": {
+          "label": "가사 로마자 변환",
+          "tooltip": "가사가 영어가 아닌 언어로 되어있는 경우, 로마자 표기를 표시합니다."
         },
         "show-lyrics-even-if-inexact": {
           "label": "가사가 정확하지 않더라도 표시",
@@ -775,6 +807,10 @@
     "tuna-obs": {
       "description": "OBS의 확장인 Tuna와의 통합을 활성화합니다",
       "name": "Tuna OBS"
+    },
+    "unobtrusive-player": {
+      "description": "노래 재생 중 플레이어가 팝업되는 것을 방지합니다",
+      "name": "플레이어 방해 금지"
     },
     "video-toggle": {
       "description": "영상/노래 모드를 전환하는 버튼을 추가합니다. 선택적으로 전체 영상 탭을 제거할 수도 있습니다",

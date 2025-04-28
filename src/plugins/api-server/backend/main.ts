@@ -13,6 +13,7 @@ import { registerAuth, registerControl } from './routes';
 import { type APIServerConfig, AuthStrategy } from '../config';
 
 import type { BackendType } from './types';
+import type { RepeatMode } from '@/types/datahost-get-state';
 
 export const backend = createBackend<BackendType, APIServerConfig>({
   async start(ctx) {
@@ -23,7 +24,21 @@ export const backend = createBackend<BackendType, APIServerConfig>({
       this.videoInfo = videoInfo;
     });
 
-    ctx.ipc.on('ytd:player-api-loaded', () => ctx.ipc.send('ytd:setup-time-changed-listener'));
+    ctx.ipc.on('ytd:player-api-loaded', () => {
+      ctx.ipc.send('ytd:setup-time-changed-listener');
+      ctx.ipc.send('ytd:setup-repeat-changed-listener');
+      ctx.ipc.send('ytd:setup-volume-changed-listener');
+    });
+
+    ctx.ipc.on(
+      'ytd:repeat-changed',
+      (mode: RepeatMode) => (this.currentRepeatMode = mode),
+    );
+
+    ctx.ipc.on(
+      'ytd:volume-changed',
+      (newVolume: number) => (this.volume = newVolume),
+    );
 
     this.run(config.hostname, config.port);
   },
@@ -51,6 +66,12 @@ export const backend = createBackend<BackendType, APIServerConfig>({
 
     this.app.use('*', cors());
 
+    // for web remote control
+    this.app.use('*', async (ctx, next) => {
+      ctx.header('Access-Control-Request-Private-Network', 'true');
+      await next();
+    });
+
     // middlewares
     this.app.use('/api/*', async (ctx, next) => {
       if (config.authStrategy !== AuthStrategy.NONE) {
@@ -75,7 +96,13 @@ export const backend = createBackend<BackendType, APIServerConfig>({
     });
 
     // routes
-    registerControl(this.app, ctx, () => this.videoInfo);
+    registerControl(
+      this.app,
+      ctx,
+      () => this.songInfo,
+      () => this.currentRepeatMode,
+      () => this.volume,
+    );
     registerAuth(this.app, ctx);
 
     // swagger

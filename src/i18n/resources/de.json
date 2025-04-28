@@ -279,6 +279,13 @@
       },
       "name": "Ambiente-Modus"
     },
+    "amuse": {
+      "description": "Fügt Unterstützung für das Amuse \"Spielt gerade\"-Widget von 6K Labs hinzu",
+      "name": "Amuse",
+      "response": {
+        "query": "Amuse API-Server läuft. /query für Liedinformationen."
+      }
+    },
     "api-server": {
       "description": "Fügt einen API-Server hinzu, um die Wiedergabe zu steuern",
       "dialog": {
@@ -484,6 +491,18 @@
         "button": "Herunterladen"
       }
     },
+    "equalizer": {
+      "description": "Fügt einen Equalizer zum Player hinzu",
+      "menu": {
+        "presets": {
+          "label": "Vorgaben",
+          "list": {
+            "bass-booster": "Bass-Verstärker"
+          }
+        }
+      },
+      "name": "Equalizer"
+    },
     "exponential-volume": {
       "description": "Macht den Lautstärkeregler exponentiell, damit es einfacher ist leise Lautstärken zu wählen.",
       "name": "Exponentielle Lautstärke"
@@ -664,6 +683,7 @@
         "listenbrainz": {
           "token": "ListenBrainz-Benutzer-Token eintragen"
         },
+        "scrobble-alternative-title": "Nutze alternative Titel",
         "scrobble-other-media": "Andere Medien scrobbeln"
       },
       "name": "Scrobbler",
@@ -714,8 +734,8 @@
     "synced-lyrics": {
       "description": "Bietet synchronisierte Liedtexte zu Songs, verwendet Anbieter wie LRClib.",
       "errors": {
-        "fetch": "⚠️ - Beim Abrufen des Liedtexts ist ein Fehler aufgetreten. Bitte versuchen Sie es später nochmal.",
-        "not-found": "⚠️ - Kein Text für diesen Song gefunden."
+        "fetch": "⚠️ - \tBeim Abrufen des Liedtexts ist ein Fehler aufgetreten. \n\tBitte versuchen Sie es später nochmal.",
+        "not-found": "⚠️ Kein Text für diesen Song gefunden."
       },
       "menu": {
         "default-text-string": {
@@ -725,6 +745,10 @@
         "line-effect": {
           "label": "Zeileneffekt",
           "submenu": {
+            "fancy": {
+              "label": "schick",
+              "tooltip": "Verwende große, app-ähnliche Effekte in der aktuellen Zeile"
+            },
             "focus": {
               "label": "Fokussieren",
               "tooltip": "Nur aktive Zeile weiß darstellen"
@@ -743,6 +767,10 @@
         "precise-timing": {
           "label": "Den Songtext perfekt synchronisieren",
           "tooltip": "Auf die Millisekunde genau berechnen, wann die nächste Zeile angezeigt werden soll (Kann Einfluss auf die Leistung haben)"
+        },
+        "romanization": {
+          "label": "Lateinische Umschrift anzeigen",
+          "tooltip": "Wenn der Liedtext in einer anderen Schrift ist, zeige nach Möglichkeit eine Version in lateinischer Schrift an."
         },
         "show-lyrics-even-if-inexact": {
           "label": "Zeige die Liedtexte, auch wenn sie ungenau sind.",
@@ -775,6 +803,10 @@
     "tuna-obs": {
       "description": "Integration mit dem OBS-Plugin Tuna",
       "name": "Tuna OBS"
+    },
+    "unobtrusive-player": {
+      "description": "Verhindert das Aufpoppen des Spielers während ein Song gespielt wird",
+      "name": "Unauffälliger Player"
     },
     "video-toggle": {
       "description": "Fügt einen Knopf hinzu, um zwischen Video-/Liedmodus zu wechseln. kann auch genutzt werden, um den ganzen Videoabschnitt zu entfernen",

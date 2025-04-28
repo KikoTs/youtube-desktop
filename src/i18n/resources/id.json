@@ -2,7 +2,7 @@
   "common": {
     "console": {
       "plugins": {
-        "execute-failed": "Gagal saat mengeksekusi plugin {{pluginName}}::{{contextName}}",
+        "execute-failed": "Plugin {{pluginName}}::{{contextName}} dieksekusi di {{ms}}ms",
         "executed-at-ms": "Plugin {{pluginName}}::{{contextName}} dieksekusi pada {{ms}}ms",
         "initialize-failed": "Gagal dalam menginisialisasi plugin \"{{pluginName}}\"",
         "load-all": "Memuat semua plugin",
@@ -279,6 +279,13 @@
       },
       "name": "Mode ambient"
     },
+    "amuse": {
+      "description": "Menambahkan dukungan YouTube Music untuk widget Amuse yang sedang diputar oleh 6K Labs",
+      "name": "Amuse",
+      "response": {
+        "query": "Server API Amuse sedang berjalan. GET /query untuk mendapatkan info lagu."
+      }
+    },
     "api-server": {
       "description": "Menambahkan server API untuk mengontrol pemutar",
       "dialog": {
@@ -484,6 +491,18 @@
         "button": "Unduh"
       }
     },
+    "equalizer": {
+      "description": "Menambahkan equalizer ke pemutar",
+      "menu": {
+        "presets": {
+          "label": "Prasetel",
+          "list": {
+            "bass-booster": "Penguat Bass"
+          }
+        }
+      },
+      "name": "Equalizer"
+    },
     "exponential-volume": {
       "description": "Buat penggeser volume menjadi eksponen sehingga memudahkan memilih volume yang lebih rendah.",
       "name": "Volume Eksponen"
@@ -664,6 +683,7 @@
         "listenbrainz": {
           "token": "Masukkan token pengguna ListenBrainz"
         },
+        "scrobble-alternative-title": "Gunakan judul alternatif",
         "scrobble-other-media": "Scrobble media lain"
       },
       "name": "Scrobbler",
@@ -714,8 +734,8 @@
     "synced-lyrics": {
       "description": "Menyediakan lirik lagu yang disinkronkan, menggunakan penyedia seperti LRClib.",
       "errors": {
-        "fetch": "⚠️ - Terjadi kesalahan saat mengambil lirik. Coba lagi nanti.",
-        "not-found": "⚠️ - Tidak ada lirik yang ditemukan untuk lagu ini."
+        "fetch": "⚠️\tTerjadi kesalahan saat mengambil lirik.\n\tSilakan coba lagi nanti.",
+        "not-found": "⚠️ Tidak ada lirik yang ditemukan untuk lagu ini."
       },
       "menu": {
         "default-text-string": {
@@ -725,6 +745,10 @@
         "line-effect": {
           "label": "Efek garis",
           "submenu": {
+            "fancy": {
+              "label": "Mewah",
+              "tooltip": "Gunakan efek besar seperti aplikasi pada baris saat ini"
+            },
             "focus": {
               "label": "Fokus",
               "tooltip": "Jadikan hanya baris saat ini berwarna putih"
@@ -743,6 +767,10 @@
         "precise-timing": {
           "label": "Buat liriknya tersinkronisasi dengan sempurna",
           "tooltip": "Hitung hingga milidetik tampilan baris berikutnya (dapat berdampak kecil pada kinerja)"
+        },
+        "romanization": {
+          "label": "Romanize Liriknya",
+          "tooltip": "Apabila lirik berada dalam bahasa berbeda, cobalah untuk menampilkan versi latinnya."
         },
         "show-lyrics-even-if-inexact": {
           "label": "Tampilkan lirik meskipun tidak tepat",
@@ -775,6 +803,10 @@
     "tuna-obs": {
       "description": "Integrasi dengan plugin Tuna OBS",
       "name": "Tuna OBS"
+    },
+    "unobtrusive-player": {
+      "description": "Cegah pemutar musik muncul ketika memutar musik",
+      "name": "Pemutar simpel (tidak menganggu)"
     },
     "video-toggle": {
       "description": "Tambahkan tombol untuk beralih antara mode Lagu/Video. secara opsional juga dapat menghapus keseluruhan tab video",

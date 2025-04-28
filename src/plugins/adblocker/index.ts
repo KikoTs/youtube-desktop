@@ -8,7 +8,6 @@ import {
   unloadAdBlockerEngine,
 } from './blocker';
 
-import injectCliqzPreload from './injectors/inject-cliqz-preload';
 import { inject, isInjected } from './injectors/inject';
 import { loadAdSpeedup } from './adSpeedup';
 import blockerStyle from './style/blocker.css?inline';
@@ -144,9 +143,7 @@ export default createPlugin({
       }
     },
     async onConfigChange(newConfig) {
-      if (newConfig.blocker === blockers.WithBlocklists) {
-        await injectCliqzPreload();
-      } else if (newConfig.blocker === blockers.InPlayer && !isInjected()) {
+      if (newConfig.blocker === blockers.InPlayer && !isInjected()) {
         inject(contextBridge);
         await webFrame.executeJavaScript(this.script);
       }
