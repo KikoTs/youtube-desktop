@@ -14,7 +14,7 @@ export interface TrackInfo {
   isAdvertisement: boolean;
 }
 
-export interface AmuseSongInfo {
+export interface AmuseVideoInfo {
   player: PlayerInfo;
   track: TrackInfo;
 }

@@ -91,13 +91,13 @@ export const setupShuffleChangedListener = singleton(() => {
   const playerBar = document.querySelector('ytmusic-player-bar');
 
   if (!playerBar) {
-    window.ipcRenderer.send('ytmd:shuffle-changed-supported', false);
+    window.ipcRenderer.send('ytd:shuffle-changed-supported', false);
     return;
   }
 
   const observer = new MutationObserver(() => {
     window.ipcRenderer.send(
-      'ytmd:shuffle-changed',
+      'ytd:shuffle-changed',
       (playerBar?.attributes.getNamedItem('shuffle-on') ?? null) !== null,
     );
   });

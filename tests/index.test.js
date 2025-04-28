@@ -34,7 +34,7 @@ test('YouTube App - With default settings, app is launched and visible', async (
   expect(title.replaceAll(/\s/g, ' ')).toEqual('YouTube');
 
   const url = window.url();
-  expect(url.startsWith('https://youtube.com')).toBe(true);
+  expect(url.startsWith('https://www.youtube.com')).toBe(true);
 
   await app.close();
 });

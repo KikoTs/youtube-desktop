@@ -90,8 +90,8 @@ async function onApiLoaded() {
     return isShuffled !== null;
   };
 
-  window.ipcRenderer.on('ytmd:get-shuffle', () => {
-    window.ipcRenderer.send('ytmd:get-shuffle-response', isShuffled());
+  window.ipcRenderer.on('ytd:get-shuffle', () => {
+    window.ipcRenderer.send('ytd:get-shuffle-response', isShuffled());
   });
 
   window.ipcRenderer.on(
@@ -172,7 +172,7 @@ async function onApiLoaded() {
   });
 
   window.ipcRenderer.on(
-    'ytmd:add-to-queue',
+    'ytd:add-to-queue',
     (_, videoId: string, queueInsertPosition: string) => {
       const queue = document.querySelector<QueueElement>('#queue');
       const app = document.querySelector<YouTubeAppElement>('ytmusic-app');
@@ -227,7 +227,7 @@ async function onApiLoaded() {
     },
   );
   window.ipcRenderer.on(
-    'ytmd:move-in-queue',
+    'ytd:move-in-queue',
     (_, fromIndex: number, toIndex: number) => {
       const queue = document.querySelector<QueueElement>('#queue');
       queue?.dispatch({
@@ -239,21 +239,21 @@ async function onApiLoaded() {
       });
     },
   );
-  window.ipcRenderer.on('ytmd:remove-from-queue', (_, index: number) => {
+  window.ipcRenderer.on('ytd:remove-from-queue', (_, index: number) => {
     const queue = document.querySelector<QueueElement>('#queue');
     queue?.dispatch({
       type: 'REMOVE_ITEM',
       payload: index,
     });
   });
-  window.ipcRenderer.on('ytmd:set-queue-index', (_, index: number) => {
+  window.ipcRenderer.on('ytd:set-queue-index', (_, index: number) => {
     const queue = document.querySelector<QueueElement>('#queue');
     queue?.dispatch({
       type: 'SET_INDEX',
       payload: index,
     });
   });
-  window.ipcRenderer.on('ytmd:clear-queue', () => {
+  window.ipcRenderer.on('ytd:clear-queue', () => {
     const queue = document.querySelector<QueueElement>('#queue');
     queue?.queue.store.store.dispatch({
       type: 'SET_PLAYER_PAGE_INFO',
@@ -264,7 +264,7 @@ async function onApiLoaded() {
     });
   });
 
-  window.ipcRenderer.on('ytmd:search', async (_, query: string) => {
+  window.ipcRenderer.on('ytd:search', async (_, query: string) => {
     const app = document.querySelector<YouTubeAppElement>('ytmusic-app');
     const searchBox =
       document.querySelector<SearchBoxElement>('ytmusic-search-box');
@@ -276,7 +276,7 @@ async function onApiLoaded() {
       suggestStats: searchBox.getSearchboxStats(),
     });
 
-    window.ipcRenderer.send('ytmd:search-results', result);
+    window.ipcRenderer.send('ytd:search-results', result);
   });
 
   const video = document.querySelector('video')!;

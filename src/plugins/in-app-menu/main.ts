@@ -16,6 +16,7 @@ export const onMainLoad = ({
   window: win,
   ipc: { handle, send },
 }: BackendContext<InAppMenuConfig>) => {
+  console.log('onMainLoad');
   win.on('close', () => {
     send('close-all-in-app-menu-panel');
   });

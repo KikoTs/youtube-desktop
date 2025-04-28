@@ -135,7 +135,7 @@ export default createPlugin({
 
       if (config.blocker === blockers.WithBlocklists) {
         // Preload adblocker to inject scripts/styles
-        await injectCliqzPreload();
+        //await injectCliqzPreload();
         webFrame.insertCSS(blockerStyle);
       } else if (config.blocker === blockers.InPlayer && !isInjected()) {
         inject(contextBridge);

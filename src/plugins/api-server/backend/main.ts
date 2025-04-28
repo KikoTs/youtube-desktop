@@ -99,7 +99,7 @@ export const backend = createBackend<BackendType, APIServerConfig>({
     registerControl(
       this.app,
       ctx,
-      () => this.songInfo,
+      () => this.videoInfo,
       () => this.currentRepeatMode,
       () => this.volume,
     );

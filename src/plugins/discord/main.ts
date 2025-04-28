@@ -176,7 +176,7 @@ export const backend = createBackend<
     if (config.playOnYouTubeMusic) {
       buttons.push({
         label: 'Play on YouTube Music',
-        url: videoInfo.url ?? 'https://youtube.com',
+        url: videoInfo.url ?? 'https://www.youtube.com',
       });
     }
     if (!config.hideGitHubButton) {
