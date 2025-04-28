@@ -271,6 +271,7 @@
     "electron-unhandled": "4.0.1",
     "electron-updater": "6.6.2",
     "es-hangul": "2.3.3",
+    "extract-zip": "^2.0.1",
     "fast-average-color": "9.5.0",
     "fast-equals": "5.2.2",
     "filenamify": "6.0.0",

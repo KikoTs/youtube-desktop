@@ -28,7 +28,7 @@ const createContext = (
   window: win,
   refresh: async () => {
     await setApplicationMenu(win);
-
+    console.log('in-app-menu', config.plugins.isEnabled('in-app-menu'));
     if (config.plugins.isEnabled('in-app-menu')) {
       win.webContents.send('refresh-in-app-menu');
     }

@@ -104,7 +104,7 @@ const sendError = (error: Error, source?: string) => {
 export const getCookieFromWindow = async (win: BrowserWindow) => {
   return (
     await win.webContents.session.cookies.get({
-      url: 'https://youtube.com',
+      url: 'https://www.youtube.com',
     })
   )
     .map((it) => it.name + '=' + it.value)

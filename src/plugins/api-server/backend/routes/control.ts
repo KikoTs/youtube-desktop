@@ -8,19 +8,16 @@ import {
   type ResponseVideoInfo,
   VideoInfoSchema,
   GoForwardScheme,
-  AddSongToQueueSchema,
+  AddVideoToQueueSchema,
   GoBackSchema,
-  GoForwardScheme,
-  MoveSongInQueueSchema,
+  MoveVideoInQueueSchema,
   QueueParamsSchema,
   SearchSchema,
   SeekSchema,
   SetFullscreenSchema,
   SetQueueIndexSchema,
   SetVolumeSchema,
-  SongInfoSchema,
   SwitchRepeatSchema,
-  type ResponseSongInfo,
 } from '../scheme';
 
 import type { RepeatMode } from '@/types/datahost-get-state';
@@ -28,7 +25,7 @@ import type { VideoInfo } from '@/providers/video-info';
 import type { BackendContext } from '@/types/contexts';
 import type { APIServerConfig } from '../../config';
 import type { HonoApp } from '../types';
-import type { QueueResponse } from '@/types/youtube-music-desktop-internal';
+import type { QueueResponse } from '@/types/youtube-desktop-internal';
 import type { Context } from 'hono';
 
 const API_VERSION = 'v1';
@@ -357,8 +354,8 @@ const routes = {
   videoInfo: createRoute({
     method: 'get',
     path: `/api/${API_VERSION}/video-info`,
-    summary: 'get current video info',
-    description: 'Get the current video info',
+    summary: 'get video info',
+    description: 'Get information about the current video',
     responses: {
       200: {
         description: 'Success',
@@ -367,28 +364,6 @@ const routes = {
             schema: VideoInfoSchema,
           },
         },
-      },
-      204: {
-        description: 'No video info',
-      },
-    },
-  }),
-  songInfo: createRoute({
-    method: 'get',
-    path: `/api/${API_VERSION}/song`,
-    summary: 'get current song info',
-    description: 'Get the current song info',
-    responses: {
-      200: {
-        description: 'Success',
-        content: {
-          'application/json': {
-            schema: SongInfoSchema,
-          },
-        },
-      },
-      204: {
-        description: 'No song info',
       },
     },
   }),
@@ -411,17 +386,17 @@ const routes = {
       },
     },
   }),
-  addSongToQueue: createRoute({
+  addToQueue: createRoute({
     method: 'post',
-    path: `/api/${API_VERSION}/queue`,
-    summary: 'add song to queue',
-    description: 'Add a song to the queue',
+    path: `/api/${API_VERSION}/add-to-queue`,
+    summary: 'add to queue',
+    description: 'Add a video to the queue',
     request: {
       body: {
-        description: 'video id of the song to add',
+        description: 'video id and position',
         content: {
           'application/json': {
-            schema: AddSongToQueueSchema,
+            schema: AddVideoToQueueSchema,
           },
         },
       },
@@ -432,18 +407,17 @@ const routes = {
       },
     },
   }),
-  moveSongInQueue: createRoute({
-    method: 'patch',
-    path: `/api/${API_VERSION}/queue/{index}`,
-    summary: 'move song in queue',
-    description: 'Move a song in the queue',
+  moveInQueue: createRoute({
+    method: 'post',
+    path: `/api/${API_VERSION}/move-in-queue`,
+    summary: 'move in queue',
+    description: 'Move a video in the queue',
     request: {
-      params: QueueParamsSchema,
       body: {
-        description: 'index to move the song to',
+        description: 'from and to indexes',
         content: {
           'application/json': {
-            schema: MoveSongInQueueSchema,
+            schema: MoveVideoInQueueSchema,
           },
         },
       },
@@ -454,11 +428,11 @@ const routes = {
       },
     },
   }),
-  removeSongFromQueue: createRoute({
+  removeFromQueue: createRoute({
     method: 'delete',
-    path: `/api/${API_VERSION}/queue/{index}`,
-    summary: 'remove song from queue',
-    description: 'Remove a song from the queue',
+    path: `/api/${API_VERSION}/queue/:index`,
+    summary: 'remove from queue',
+    description: 'Remove a video from the queue',
     request: {
       params: QueueParamsSchema,
     },
@@ -680,8 +654,8 @@ export const register = (
     return ctx.json({ state: fullscreen });
   });
 
-  const songInfo = (ctx: Context) => {
-    const info = songInfoGetter();
+  const videoInfo = (ctx: Context) => {
+    const info = videoInfoGetter();
 
     if (!info) {
       ctx.status(204);
@@ -692,10 +666,9 @@ export const register = (
     delete body.image;
 
     ctx.status(200);
-    return ctx.json(body satisfies ResponseSongInfo);
+    return ctx.json(body satisfies ResponseVideoInfo);
   };
-  app.openapi(routes.oldSongInfo, songInfo);
-  app.openapi(routes.songInfo, songInfo);
+  app.openapi(routes.videoInfo, videoInfo);
 
   // Queue
   const queueInfo = async (ctx: Context) => {
@@ -720,27 +693,25 @@ export const register = (
   app.openapi(routes.oldQueueInfo, queueInfo);
   app.openapi(routes.queueInfo, queueInfo);
 
-  app.openapi(routes.addSongToQueue, (ctx) => {
+  app.openapi(routes.addToQueue, (ctx) => {
     const { videoId, insertPosition } = ctx.req.valid('json');
     controller.addSongToQueue(videoId, insertPosition);
 
     ctx.status(204);
     return ctx.body(null);
   });
-  app.openapi(routes.videoInfo, (ctx) => {
-    const info = videoInfoGetter();
+  app.openapi(routes.moveInQueue, (ctx) => {
+    const { from, to } = ctx.req.valid('json');
+    controller.moveSongInQueue(from, to);
 
     ctx.status(204);
     return ctx.body(null);
   });
-  app.openapi(routes.removeSongFromQueue, (ctx) => {
+  app.openapi(routes.removeFromQueue, (ctx) => {
     const index = Number(ctx.req.param('index'));
     controller.removeSongFromQueue(index);
 
-    const body = { ...info};
-    delete body.image;
-
-    ctx.status(200);
-    return ctx.json(body satisfies ResponseVideoInfo);
+    ctx.status(204);
+    return ctx.body(null);
   });
 };

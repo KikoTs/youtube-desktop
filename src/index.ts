@@ -957,7 +957,7 @@ function removeContentSecurityPolicy(
         !details.responseHeaders['access-control-allow-origin'] &&
         !details.responseHeaders['Access-Control-Allow-Origin']
       ) {
-        details.responseHeaders['access-control-allow-origin'] = ['https://music.youtube.com'];
+        details.responseHeaders['access-control-allow-origin'] = ['https://www.youtube.com'];
       }
     }
 

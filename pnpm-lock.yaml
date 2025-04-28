@@ -124,8 +124,14 @@ importers:
         specifier: 4.0.1
         version: 4.0.1
       electron-updater:
-        specifier: 6.3.9
-        version: 6.3.9
+        specifier: 6.6.2
+        version: 6.6.2
+      es-hangul:
+        specifier: 2.3.3
+        version: 2.3.3
+      extract-zip:
+        specifier: ^2.0.1
+        version: 2.0.1
       fast-average-color:
         specifier: 9.5.0
         version: 9.5.0

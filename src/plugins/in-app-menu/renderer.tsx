@@ -24,7 +24,7 @@ export const onRendererLoad = async ({
   ipc,
 }: RendererContext<InAppMenuConfig>) => {
   setConfig(await getConfig());
-
+  console.log('onRendererLoad');
   document.title = 'YouTube';
   const stylesheet = new CSSStyleSheet();
   stylesheet.replaceSync(scrollStyle);

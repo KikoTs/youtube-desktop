@@ -4,40 +4,40 @@ import { type Context, Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { serve } from '@hono/node-server';
 
-import registerCallback, { type SongInfo } from '@/providers/song-info';
+import registerCallback, { type VideoInfo } from '@/providers/video-info';
 import { createBackend } from '@/utils';
 
-import type { AmuseSongInfo } from './types';
+import type { AmuseVideoInfo } from './types';
 
 const amusePort = 9863;
 
-const formatSongInfo = (info: SongInfo) => {
-  const formattedSongInfo: AmuseSongInfo = {
+const formatVideoInfo = (info: VideoInfo) => {
+  const formattedVideoInfo: AmuseVideoInfo = {
     player: {
-      hasSong: !!(info.artist && info.title),
+      hasSong: !!(info.author && info.title),
       isPaused: info.isPaused ?? false,
       seekbarCurrentPosition: info.elapsedSeconds ?? 0,
     },
     track: {
-      duration: info.songDuration,
+      duration: info.videoDuration,
       title: info.title,
-      author: info.artist,
+      author: info.author,
       cover: info.imageSrc ?? '',
       url: info.url ?? '',
       id: info.videoId,
       isAdvertisement: false,
     },
   };
-  return formattedSongInfo;
+  return formattedVideoInfo;
 };
 
 export default createBackend({
-  currentSongInfo: {} as SongInfo,
+  currentVideoInfo: {} as VideoInfo,
   app: null as Hono | null,
   server: null as ReturnType<typeof serve> | null,
   start() {
-    registerCallback((songInfo) => {
-      this.currentSongInfo = songInfo;
+    registerCallback((videoInfo) => {
+      this.currentVideoInfo = videoInfo;
     });
 
     this.app = new Hono();
@@ -47,7 +47,7 @@ export default createBackend({
     );
 
     const queryAndApiHandler = (ctx: Context) => {
-      return ctx.json(formatSongInfo(this.currentSongInfo), 200);
+      return ctx.json(formatVideoInfo(this.currentVideoInfo), 200);
     };
 
     this.app.get('/query', queryAndApiHandler);

@@ -50,7 +50,7 @@ export default createPlugin({
       const config = await getConfig();
 
       document.addEventListener(
-        'ytmd:audio-can-play',
+        'ytd:audio-can-play',
         ({ detail: { audioSource, audioContext } }) => {
           const filtersToApply = config.filters.concat(
             defaultPresets
