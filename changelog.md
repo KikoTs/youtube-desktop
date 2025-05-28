@@ -1652,7 +1652,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - [Snyk] Upgrade @ffmpeg/core from 0.8.5 to 0.9.0 [`#298`](https://github.com/th-ch/youtube-music/pull/298)
 - [Snyk] Upgrade filenamify from 4.2.0 to 4.3.0 [`#293`](https://github.com/th-ch/youtube-music/pull/293)
 - [Snyk] Upgrade ytpl from 2.1.1 to 2.2.0 [`#285`](https://github.com/th-ch/youtube-music/pull/285)
-- fix song-info callback duplication [`#269`](https://github.com/th-ch/youtube-music/pull/269)
+- fix video-info callback duplication [`#269`](https://github.com/th-ch/youtube-music/pull/269)
 - fix notification showing appID instead of app name on windows [`#270`](https://github.com/th-ch/youtube-music/pull/270)
 - Upgrade electron to v12 [`#273`](https://github.com/th-ch/youtube-music/pull/273)
 - fix last-fm overwrite config on each start [`#267`](https://github.com/th-ch/youtube-music/pull/267)
