@@ -332,7 +332,31 @@ async function downloadSongUnsafe(
       );
   }
 
-  let info: TrackInfo | VideoInfo = await yt.music.getInfo(id);
+  // Detect if we're dealing with YouTube Music or regular YouTube
+  const isYouTubeMusic = !isId && (idOrUrl.includes('music.youtube.com') || 
+                                   idOrUrl.includes('ytmusic://'));
+  
+  // Use appropriate API based on platform
+  let info: TrackInfo | VideoInfo;
+  try {
+    if (isYouTubeMusic) {
+      info = await yt.music.getInfo(id);
+    } else {
+      // For regular YouTube videos, use the standard getInfo method
+      info = await yt.getInfo(id);
+    }
+  } catch (error) {
+    // If YouTube Music fails, try regular YouTube as fallback
+    if (isYouTubeMusic) {
+      try {
+        info = await yt.getInfo(id);
+      } catch (fallbackError) {
+        throw error; // Throw original error
+      }
+    } else {
+      throw error;
+    }
+  }
 
   if (!info) {
     throw new Error(
@@ -340,7 +364,7 @@ async function downloadSongUnsafe(
     );
   }
 
-  const metadata = getMetadata(info);
+  const metadata = getUnifiedMetadata(info);
   // if (metadata.album === 'N/A') { // no wtf
   //   metadata.album = '';
   // }
@@ -616,6 +640,10 @@ export async function downloadPlaylist(givenUrl?: string | URL) {
     givenUrl = new URL(win.webContents.getURL());
   }
 
+  // Detect if we're dealing with YouTube Music or regular YouTube
+  const isYouTubeMusic = givenUrl.hostname === 'music.youtube.com' || 
+                         givenUrl.href.includes('music.youtube.com');
+
   const playlistId =
     getPlaylistID(givenUrl) || getPlaylistID(new URL(playingUrl));
 
@@ -634,17 +662,27 @@ export async function downloadPlaylist(givenUrl?: string | URL) {
     }),
   );
   sendFeedback(t('plugins.downloader.backend.feedback.getting-playlist-info'));
-  let playlist: Playlist;
-  const items: YTNodes.MusicResponsiveListItem[] = [];
+  
+  let playlist: any; // Use any to handle both YouTube and YouTube Music playlists
+  const items: any[] = [];
+  
   try {
-    playlist = await yt.music.getPlaylist(playlistId);
-    if (playlist?.items) {
-      const filteredItems = playlist.items.filter(
-        (item): item is YTNodes.MusicResponsiveListItem =>
-          item instanceof YTNodes.MusicResponsiveListItem,
-      );
-
-      items.push(...filteredItems);
+    if (isYouTubeMusic) {
+      // Use YouTube Music API
+      playlist = await yt.music.getPlaylist(playlistId);
+      if (playlist?.items) {
+        const filteredItems = playlist.items.filter(
+          (item: any): item is YTNodes.MusicResponsiveListItem =>
+            item instanceof YTNodes.MusicResponsiveListItem,
+        );
+        items.push(...filteredItems);
+      }
+    } else {
+      // Use regular YouTube API
+      playlist = await yt.getPlaylist(playlistId);
+      if (playlist?.items) {
+        items.push(...playlist.items);
+      }
     }
   } catch (error: unknown) {
     sendError(
@@ -677,11 +715,11 @@ export async function downloadPlaylist(givenUrl?: string | URL) {
     'NO_TITLE';
   const isAlbum = !normalPlaylistTitle;
 
-  while (playlist.has_continuation) {
+  while (playlist.has_continuation && isYouTubeMusic) {
     playlist = await playlist.getContinuation();
 
     const filteredItems = playlist.items.filter(
-      (item): item is YTNodes.MusicResponsiveListItem =>
+      (item: any): item is YTNodes.MusicResponsiveListItem =>
         item instanceof YTNodes.MusicResponsiveListItem,
     );
 
@@ -771,22 +809,42 @@ export async function downloadPlaylist(givenUrl?: string | URL) {
         }),
       );
       const trackId = isAlbum ? counter : undefined;
+      
+      // Get the video ID based on the platform
+      let videoId: string;
+      if (isYouTubeMusic) {
+        videoId = song.id!;
+      } else {
+        // Regular YouTube playlist item
+        videoId = song.id || song.video_id || (song.endpoint?.payload?.videoId);
+      }
+      
+      if (!videoId) {
+        console.warn('Could not find video ID for playlist item:', song);
+        counter++;
+        continue;
+      }
+      
       await downloadSongFromId(
-        song.id!,
+        videoId,
         playlistFolder,
         trackId?.toString(),
         increaseProgress,
-      ).catch((error) =>
+      ).catch((error) => {
+        // Get title and author safely
+        const title = song.title?.text || song.title || 'Unknown Title';
+        const author = song.author?.name || song.author || 'Unknown Author';
+        
         sendError(
           new Error(
             t('plugins.downloader.backend.feedback.error-while-downloading', {
-              author: song.author!.name,
-              title: song.title!,
+              author,
+              title,
               error: String(error),
             }),
           ),
-        ),
-      );
+        );
+      });
 
       win.setProgressBar(counter / items.length);
       setBadge(items.length - counter);
@@ -831,15 +889,48 @@ const getVideoId = (url: URL | string): string | null => {
   return new URL(url).searchParams.get('v');
 };
 
-const getMetadata = (info: TrackInfo): CustomSongInfo => ({
-  videoId: info.basic_info.id!,
-  title: cleanupName(info.basic_info.title!),
-  author: cleanupName(info.basic_info.author!),
-  imageSrc: info.basic_info.thumbnail?.find((t) => !t.url.endsWith('.webp'))
-    ?.url,
-  views: info.basic_info.view_count!,
-  videoDuration: info.basic_info.duration!,
-});
+const getUnifiedMetadata = (info: TrackInfo | VideoInfo): CustomSongInfo => {
+  const basicInfo = info.basic_info;
+  
+  // Handle different property names between TrackInfo and VideoInfo
+  let author: string;
+  let views: number;
+  let duration: number;
+  let thumbnail: any;
+
+  if ('author' in basicInfo && basicInfo.author) {
+    // TrackInfo
+    author = cleanupName(basicInfo.author);
+    views = basicInfo.view_count || 0;
+    duration = basicInfo.duration || 0;
+    thumbnail = basicInfo.thumbnail;
+  } else if ('channel' in basicInfo && basicInfo.channel) {
+    // VideoInfo
+    author = cleanupName(basicInfo.channel.name || '');
+    views = typeof basicInfo.view_count === 'string' 
+      ? parseInt(basicInfo.view_count) || 0 
+      : basicInfo.view_count || 0;
+    duration = typeof basicInfo.duration === 'number' 
+      ? basicInfo.duration 
+      : parseInt(String(basicInfo.duration)) || 0;
+    thumbnail = basicInfo.thumbnail;
+  } else {
+    // Fallback
+    author = 'Unknown';
+    views = 0;
+    duration = 0;
+    thumbnail = null;
+  }
+
+  return {
+    videoId: basicInfo.id!,
+    title: cleanupName(basicInfo.title!),
+    author,
+    imageSrc: thumbnail?.find((t: any) => !t.url.endsWith('.webp'))?.url,
+    views,
+    videoDuration: duration,
+  };
+};
 
 // This is used to bypass age restrictions
 const getAndroidTvInfo = async (id: string): Promise<VideoInfo> => {

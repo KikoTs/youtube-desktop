@@ -30,14 +30,14 @@ export const buildDiscordButtons = (
   const buttons: GatewayActivityButton[] = [];
   if (config.playOnYouTubeMusic && videoInfo.url) {
     buttons.push({
-      label: 'Play on YouTube Music',
+      label: 'Play on YouTube',
       url: videoInfo.url,
     });
   }
   if (!config.hideGitHubButton) {
     buttons.push({
       label: 'View App On GitHub',
-      url: 'https://github.com/th-ch/youtube-music',
+      url: 'https://github.com/KikoTs/youtube-desktop',
     });
   }
   return buttons.length ? buttons : undefined;
