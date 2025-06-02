@@ -9,7 +9,7 @@ env:
   NODE_VERSION: "20.x"
 
 permissions:
-  contents: write   # ensure GITHUB_TOKEN can create releases, push tags, etc.
+  contents: write   # allow GITHUB_TOKEN to push tags, commit, and create releases
 
 jobs:
   build:
@@ -24,7 +24,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # no need to fetch tags or full history here; this is just for building
           fetch-depth: 0
 
       - name: Install pnpm
@@ -49,12 +48,12 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      # If this is a PR (or coming from a fork), only build (no release)
+      # If this is a PR (or fork), only build—no release packaging
       - name: Vite Build (PR or fork only)
         if: github.repository == 'KikoTs/youtube-desktop' && github.event_name == 'pull_request'
         run: pnpm build
 
-      # Build & Package on macOS (only on master, not in PR)
+      # Build & Package on macOS (only on master, not a PR)
       - name: Build & Package (macOS)
         if: |
           startsWith(matrix.os, 'macos') &&
@@ -64,7 +63,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm release:mac
 
-      # Build & Package on Linux
+      # Build & Package on Linux (only on master, not a PR)
       - name: Build & Package (Linux)
         if: |
           startsWith(matrix.os, 'ubuntu') &&
@@ -82,7 +81,7 @@ jobs:
           sudo flatpak install -y flathub org.electronjs.Electron2.BaseApp/x86_64/24.08
           pnpm release:linux
 
-      # Build & Package on Windows
+      # Build & Package on Windows (only on master, not a PR)
       - name: Build & Package (Windows)
         if: |
           startsWith(matrix.os, 'windows') &&
@@ -104,7 +103,7 @@ jobs:
       - name: Checkout (full history)
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # needed so that `git tag` can check for existing tags
+          fetch-depth: 0
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -121,7 +120,7 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      # 1) Compute VERSION_TAG (e.g. “v1.2.3”) from package.json
+      # 1) Compute VERSION_TAG and CHANGELOG_ANCHOR from package.json
       - name: Get version from package.json
         id: get_version
         run: |
@@ -167,13 +166,14 @@ jobs:
           git tag "${{ env.VERSION_TAG }}"
           git push origin "${{ env.VERSION_TAG }}"
 
-      # 5) Create GitHub Release (only if new version)
+      # 5) Create GitHub Release (only if new version) using create-release@v2
       - name: Create GitHub Release (only if new version)
         if: env.EXISTS == 'false'
-        uses: actions/create-release@v1
+        uses: actions/create-release@v2
         with:
-          owner:        KikoTs                       # your GitHub username / org
-          repo:         youtube-desktop               # your repo name
+          token:        ${{ secrets.GITHUB_TOKEN }}
+          owner:        KikoTs
+          repo:         youtube-desktop
           tag_name:     ${{ env.VERSION_TAG }}
           release_name: ${{ env.VERSION_TAG }}
           body: |
