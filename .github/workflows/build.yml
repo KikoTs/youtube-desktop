@@ -1,4 +1,4 @@
-name: Build & Auto-Release YouTube
+name: Build YouTube & Release
 
 on:
   push:
@@ -8,12 +8,9 @@ on:
 env:
   NODE_VERSION: "20.x"
 
-permissions:
-  contents: write   # so GITHUB_TOKEN can push tags, commit changelog, and create releases
-
 jobs:
   build:
-    name: Build on ${{ matrix.os }}
+    name: Build YouTube
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
@@ -21,10 +18,7 @@ jobs:
         os: [ macos-latest, ubuntu-latest, windows-latest ]
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -32,43 +26,38 @@ jobs:
           version: 10
           run_install: false
 
-      - name: Setup Node.js (Linux/Windows)
-        if: startsWith(matrix.os, 'macos') != true
+      - name: Setup NodeJS
+        if: startsWith(matrix.os, 'macOS') != true
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
 
-      - name: Setup Node.js (macOS)
-        if: startsWith(matrix.os, 'macos')
+      - name: Setup NodeJS for macOS
+        if: startsWith(matrix.os, 'macOS')
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # If this is a PR (or a fork), only run the build step (no release packaging)
-      - name: Vite Build (PR or fork only)
+      # Only vite build without release if it is a fork, or it is a pull-request
+      - name: Vite Build
         if: github.repository == 'KikoTs/youtube-desktop' && github.event_name == 'pull_request'
-        run: pnpm build
+        run: |
+          pnpm build
 
-      # Build & Package on macOS (only when pushing to master, not on PR)
-      - name: Build & Package (macOS)
-        if: |
-          startsWith(matrix.os, 'macos') &&
-          github.repository == 'KikoTs/youtube-desktop' &&
-          github.event_name != 'pull_request'
+      # Build and release if it's the main repository and is not pull-request
+      - name: Build and release on Mac
+        if: startsWith(matrix.os, 'macOS') && (github.repository == 'KikoTs/youtube-desktop' && github.event_name != 'pull_request')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm release:mac
+        run: |
+          pnpm release:mac
 
-      # Build & Package on Linux (only when pushing to master, not on PR)
-      - name: Build & Package (Linux)
-        if: |
-          startsWith(matrix.os, 'ubuntu') &&
-          github.repository == 'KikoTs/youtube-desktop' &&
-          github.event_name != 'pull_request'
+      - name: Build and release on Linux
+        if: startsWith(matrix.os, 'ubuntu') && (github.repository == 'KikoTs/youtube-desktop' && github.event_name != 'pull_request')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -81,27 +70,28 @@ jobs:
           sudo flatpak install -y flathub org.electronjs.Electron2.BaseApp/x86_64/24.08
           pnpm release:linux
 
-      # Build & Package on Windows (only when pushing to master, not on PR)
-      - name: Build & Package (Windows)
-        if: |
-          startsWith(matrix.os, 'windows') &&
-          github.repository == 'KikoTs/youtube-desktop' &&
-          github.event_name != 'pull_request'
+      - name: Build and release on Windows
+        if: startsWith(matrix.os, 'windows') && (github.repository == 'KikoTs/youtube-desktop' && github.event_name != 'pull_request')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm release:win
+        run: |
+          pnpm release:win
+
+      - name: Test
+        uses: coactions/setup-xvfb@v1
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+        with:
+          run: pnpm test:debug
+
 
   release:
-    name: Auto-Publish Release
     runs-on: ubuntu-latest
+    name: Release YouTube
+    if: github.repository == 'KikoTs/youtube-desktop' && github.ref == 'refs/heads/master'
     needs: build
-    if: |
-      github.repository == 'KikoTs/youtube-desktop' &&
-      github.ref == 'refs/heads/master' &&
-      github.event_name != 'pull_request'
     steps:
-      - name: Checkout (full history)
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -111,71 +101,70 @@ jobs:
           version: 10
           run_install: false
 
-      - name: Setup Node.js
+      - name: Setup NodeJS
+        if: startsWith(matrix.os, 'macOS') != true
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
 
-      - name: Install Dependencies
+      - name: Setup NodeJS for macOS
+        if: startsWith(matrix.os, 'macOS')
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # 1) Compute VERSION_TAG and CHANGELOG_ANCHOR from package.json
-      - name: Get version from package.json
-        id: get_version
+      - name: Get version
         run: |
-          version=$(node -p "require('./package.json').version")
-          echo "VERSION_TAG=v${version}" >> $GITHUB_ENV
-          short_ver=$(echo "${version}" | sed 's/\.//g')
-          echo "CHANGELOG_ANCHOR=${short_ver}" >> $GITHUB_ENV
-          echo "VERSION_TAG is now: $VERSION_TAG"
-          echo "CHANGELOG_ANCHOR is now: $CHANGELOG_ANCHOR"
+          echo "VERSION_TAG=v$(node -pe "require('./package.json').version")" >> $GITHUB_ENV
 
-      # 2) Check if that exact tag already exists
-      - name: Check for existing tag
-        id: check_tag
+      - name: Check if version already exists in tags
         run: |
-          if git rev-parse -q --verify "refs/tags/${{ env.VERSION_TAG }}" >/dev/null; then
-            echo "EXISTS=true" >> $GITHUB_ENV
-          else
-            echo "EXISTS=false" >> $GITHUB_ENV
-          fi
+          echo "VERSION_HASH=$(git rev-parse -q --verify 'refs/tags/${{ env.VERSION_TAG }}')" >> $GITHUB_ENV
+          echo "CHANGELOG_ANCHOR=$(echo $VERSION_TAG | sed -e 's/\.//g')" >> $GITHUB_ENV
 
-      # 3) If new version, regenerate changelog
-      - name: Update changelog (only if new version)
-        if: env.EXISTS == 'false'
-        run: pnpm changelog
+      - name: Fetch draft release
+        if: ${{ env.VERSION_HASH == '' }}
+        uses: cardinalby/git-get-release-action@v1
+        id: get_draft_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          latest: true
+          draft: true
+          searchLimit: 1
 
-      - name: Commit updated changelog (only if new version)
-        if: env.EXISTS == 'false'
+      - name: Publish Release (if it does not exist)
+        if: ${{ env.VERSION_HASH == '' }}
+        uses: irongut/EditRelease@v1.2.0
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          id: ${{ steps.get_draft_release.outputs.id }}
+          draft: false
+          prerelease: false
+          replacename: true
+          name: ${{ env.VERSION_TAG }}
+          replacebody: true
+          body: |
+            See [changelog](https://github.com/KikoTs/youtube-desktop/blob/master/changelog.md#${{ env.CHANGELOG_ANCHOR }}) for the list of updates and the full diff.
+
+            Thanks to all contributors! 🏅
+
+            (Note for Windows: `YouTube-Web-Setup-${{ env.VERSION_TAG }}.exe` is an installer, and `YouTube-${{ env.VERSION_TAG }}.exe` is a portable version)
+
+      - name: Update changelog
+        if: ${{ env.VERSION_HASH == '' }}
+        run: |
+          pnpm changelog
+
+      - name: Commit changelog
+        if: ${{ env.VERSION_HASH == '' }}
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Update changelog for ${{ env.VERSION_TAG }}"
+          commit_message: Update changelog for ${{ env.VERSION_TAG }}
           file_pattern: "changelog.md"
           commit_user_name: CI
-          commit_user_email: th-ch@users.noreply.github.com
-
-      # 4) Tag this commit and push the tag (only if new version)
-      - name: Create & push git tag (only if new version)
-        if: env.EXISTS == 'false'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "${{ env.VERSION_TAG }}"
-          git push origin "${{ env.VERSION_TAG }}"
-
-      # 5) Create GitHub Release (only if new version), using GitHub CLI
-      - name: Create GitHub Release (only if new version)
-        if: env.EXISTS == 'false'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create "${{ env.VERSION_TAG }}" \
-            --title "${{ env.VERSION_TAG }}" \
-            --notes "See [changelog](https://github.com/KikoTs/youtube-desktop/blob/master/changelog.md#${{ env.CHANGELOG_ANCHOR }}) for the list of updates and full diff.
-
-          Thanks to all contributors! 🏅
-
-          (Note for Windows: \`YouTube-Web-Setup-${{ env.VERSION_TAG }}.exe\` is an installer, and \`YouTube-${{ env.VERSION_TAG }}.exe\` is a portable version)"
+          commit_user_email: KikoTs@users.noreply.github.com
