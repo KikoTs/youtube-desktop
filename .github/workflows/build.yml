@@ -8,6 +8,9 @@ on:
 env:
   NODE_VERSION: "20.x"
 
+permissions:
+  contents: write   # ensure GITHUB_TOKEN can create releases, push tags, etc.
+
 jobs:
   build:
     name: Build on ${{ matrix.os }}
@@ -18,7 +21,11 @@ jobs:
         os: [ macos-latest, ubuntu-latest, windows-latest ]
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # no need to fetch tags or full history here; this is just for building
+          fetch-depth: 0
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -42,12 +49,12 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      # If it’s a pull request from a fork or any PR, just build (no release).
+      # If this is a PR (or coming from a fork), only build (no release)
       - name: Vite Build (PR or fork only)
         if: github.repository == 'KikoTs/youtube-desktop' && github.event_name == 'pull_request'
         run: pnpm build
 
-      # Only do the “release:…” step (which packages the binary) if this is the main repo and NOT a PR.
+      # Build & Package on macOS (only on master, not in PR)
       - name: Build & Package (macOS)
         if: |
           startsWith(matrix.os, 'macos') &&
@@ -57,6 +64,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm release:mac
 
+      # Build & Package on Linux
       - name: Build & Package (Linux)
         if: |
           startsWith(matrix.os, 'ubuntu') &&
@@ -74,6 +82,7 @@ jobs:
           sudo flatpak install -y flathub org.electronjs.Electron2.BaseApp/x86_64/24.08
           pnpm release:linux
 
+      # Build & Package on Windows
       - name: Build & Package (Windows)
         if: |
           startsWith(matrix.os, 'windows') &&
@@ -95,7 +104,7 @@ jobs:
       - name: Checkout (full history)
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0   # needed so that `git tag` can check for existing tags
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -116,20 +125,12 @@ jobs:
       - name: Get version from package.json
         id: get_version
         run: |
-          # 1) ask Node for the raw version string (e.g. “1.2.3”)
           version=$(node -p "require('./package.json').version")
-      
-          # 2) export VERSION_TAG=v<that version>
           echo "VERSION_TAG=v${version}" >> $GITHUB_ENV
-      
-          # 3) compute a changelog anchor (strip dots, e.g. 1.2.3 → 123)
           short_ver=$(echo "${version}" | sed 's/\.//g')
           echo "CHANGELOG_ANCHOR=${short_ver}" >> $GITHUB_ENV
-      
-          # (optional) print them back for debugging
           echo "VERSION_TAG is now: $VERSION_TAG"
           echo "CHANGELOG_ANCHOR is now: $CHANGELOG_ANCHOR"
-      
 
       # 2) Check if that exact tag already exists
       - name: Check for existing tag
@@ -141,11 +142,11 @@ jobs:
             echo "EXISTS=false" >> $GITHUB_ENV
           fi
 
-      # 3) If it does NOT exist, update changelog on master and commit it
+      # 3) If new version, regenerate changelog and commit it
       - name: Update changelog (only if new version)
         if: env.EXISTS == 'false'
-        run: |
-          pnpm changelog
+        run: pnpm changelog
+
       - name: Commit updated changelog (only if new version)
         if: env.EXISTS == 'false'
         uses: stefanzweifel/git-auto-commit-action@v5
@@ -171,15 +172,15 @@ jobs:
         if: env.EXISTS == 'false'
         uses: actions/create-release@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: ${{ env.VERSION_TAG }}
+          owner:        KikoTs                       # your GitHub username / org
+          repo:         youtube-desktop               # your repo name
+          tag_name:     ${{ env.VERSION_TAG }}
           release_name: ${{ env.VERSION_TAG }}
-          draft: false
-          prerelease: false
           body: |
             See [changelog](https://github.com/KikoTs/youtube-desktop/blob/master/changelog.md#${{ env.CHANGELOG_ANCHOR }}) for the list of updates and full diff.
 
             Thanks to all contributors! 🏅
 
             (Note for Windows: `YouTube-Web-Setup-${{ env.VERSION_TAG }}.exe` is an installer, and `YouTube-${{ env.VERSION_TAG }}.exe` is a portable version)
-
+          draft:        false
+          prerelease:   false
