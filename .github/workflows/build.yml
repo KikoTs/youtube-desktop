@@ -9,7 +9,7 @@ env:
   NODE_VERSION: "20.x"
 
 permissions:
-  contents: write   # allow GITHUB_TOKEN to push tags, commit, and create releases
+  contents: write   # so GITHUB_TOKEN can push tags, commit changelog, and create releases
 
 jobs:
   build:
@@ -48,12 +48,12 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      # If this is a PR (or fork), only build—no release packaging
+      # If this is a PR (or a fork), only run the build step (no release packaging)
       - name: Vite Build (PR or fork only)
         if: github.repository == 'KikoTs/youtube-desktop' && github.event_name == 'pull_request'
         run: pnpm build
 
-      # Build & Package on macOS (only on master, not a PR)
+      # Build & Package on macOS (only when pushing to master, not on PR)
       - name: Build & Package (macOS)
         if: |
           startsWith(matrix.os, 'macos') &&
@@ -63,7 +63,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm release:mac
 
-      # Build & Package on Linux (only on master, not a PR)
+      # Build & Package on Linux (only when pushing to master, not on PR)
       - name: Build & Package (Linux)
         if: |
           startsWith(matrix.os, 'ubuntu') &&
@@ -81,7 +81,7 @@ jobs:
           sudo flatpak install -y flathub org.electronjs.Electron2.BaseApp/x86_64/24.08
           pnpm release:linux
 
-      # Build & Package on Windows (only on master, not a PR)
+      # Build & Package on Windows (only when pushing to master, not on PR)
       - name: Build & Package (Windows)
         if: |
           startsWith(matrix.os, 'windows') &&
@@ -141,7 +141,7 @@ jobs:
             echo "EXISTS=false" >> $GITHUB_ENV
           fi
 
-      # 3) If new version, regenerate changelog and commit it
+      # 3) If new version, regenerate changelog
       - name: Update changelog (only if new version)
         if: env.EXISTS == 'false'
         run: pnpm changelog
@@ -166,12 +166,11 @@ jobs:
           git tag "${{ env.VERSION_TAG }}"
           git push origin "${{ env.VERSION_TAG }}"
 
-      # 5) Create GitHub Release (only if new version) using create-release@v2
+      # 5) Create GitHub Release (only if new version), using create-release@v1
       - name: Create GitHub Release (only if new version)
         if: env.EXISTS == 'false'
-        uses: actions/create-release@v2
+        uses: actions/create-release@v1
         with:
-          token:        ${{ secrets.GITHUB_TOKEN }}
           owner:        KikoTs
           repo:         youtube-desktop
           tag_name:     ${{ env.VERSION_TAG }}
