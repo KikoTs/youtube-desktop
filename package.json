@@ -2,15 +2,15 @@
   "name": "youtube-desktop",
   "productName": "YouTube",
   "desktopName": "com.github.kikots.youtube",
-  "version": "4.0.0",
+  "version": "3.9.0",
   "description": "YouTube Desktop App - including custom plugins",
   "main": "./dist/main/index.js",
   "license": "MIT",
-  "repository": "th-ch/youtube-music",
+  "repository": "KikoTs/youtube-desktop",
   "author": {
-    "name": "th-ch",
-    "email": "th-ch@users.noreply.github.com",
-    "url": "https://github.com/th-ch/youtube-music"
+    "name": "KikoTs",
+    "email": "KikoTs@users.noreply.github.com",
+    "url": "https://github.com/KikoTs/youtube-desktop"
   },
   "build": {
     "appId": "com.github.kikots.youtube",
@@ -74,7 +74,7 @@
       "category": "AudioVideo",
       "desktop": {
         "entry": {
-          "StartupWMClass": "com.github.th_ch.youtube_music"
+          "StartupWMClass": "com.github.kikots.youtube"
         }
       },
       "target": [
