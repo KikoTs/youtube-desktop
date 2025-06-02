@@ -166,20 +166,16 @@ jobs:
           git tag "${{ env.VERSION_TAG }}"
           git push origin "${{ env.VERSION_TAG }}"
 
-      # 5) Create GitHub Release (only if new version), using create-release@v1
+      # 5) Create GitHub Release (only if new version), using GitHub CLI
       - name: Create GitHub Release (only if new version)
         if: env.EXISTS == 'false'
-        uses: actions/create-release@v1
-        with:
-          owner:        KikoTs
-          repo:         youtube-desktop
-          tag_name:     ${{ env.VERSION_TAG }}
-          release_name: ${{ env.VERSION_TAG }}
-          body: |
-            See [changelog](https://github.com/KikoTs/youtube-desktop/blob/master/changelog.md#${{ env.CHANGELOG_ANCHOR }}) for the list of updates and full diff.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ env.VERSION_TAG }}" \
+            --title "${{ env.VERSION_TAG }}" \
+            --notes "See [changelog](https://github.com/KikoTs/youtube-desktop/blob/master/changelog.md#${{ env.CHANGELOG_ANCHOR }}) for the list of updates and full diff.
 
-            Thanks to all contributors! 🏅
+          Thanks to all contributors! 🏅
 
-            (Note for Windows: `YouTube-Web-Setup-${{ env.VERSION_TAG }}.exe` is an installer, and `YouTube-${{ env.VERSION_TAG }}.exe` is a portable version)
-          draft:        false
-          prerelease:   false
+          (Note for Windows: \`YouTube-Web-Setup-${{ env.VERSION_TAG }}.exe\` is an installer, and \`YouTube-${{ env.VERSION_TAG }}.exe\` is a portable version)"
