@@ -1351,5 +1351,5 @@ All notable changes to this project will be documented in this file. Dates are d
 - fix #490 [`#490`](https://github.com/KikoTs/youtube-desktop/issues/490)
 - fix #472 [`#472`](https://github.com/KikoTs/youtube-desktop/issues/472)
 - Removed Youtube Music Specific Plugins and Added Extension Plugin for additional extensions (UBlock Origin, SponsorBlock, DeArrow) [`60bed2a`](https://github.com/KikoTs/youtube-desktop/commit/60bed2a8b5a1a3bf211fe1e01256370cfb5b230c)
+- Update changelog for v3.9.0 [`01470ba`](https://github.com/KikoTs/youtube-desktop/commit/01470ba9a16cc3cab9356e89d06971b6c916f016)
 - Now atleast it build and loads plugins, stopped extensions! [`b601389`](https://github.com/KikoTs/youtube-desktop/commit/b601389f9ed679d2fbdb88cc48c388f5c46cccc5)
-- Fixed Downloader + Extensions Loader [`c8fbfcd`](https://github.com/KikoTs/youtube-desktop/commit/c8fbfcdaacff51f1268b3ed77c20257c4e931b75)
