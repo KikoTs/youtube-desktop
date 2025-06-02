@@ -116,11 +116,20 @@ jobs:
       - name: Get version from package.json
         id: get_version
         run: |
-          echo "VERSION_TAG=v$(node -pe \"require('./package.json').version\")" >> $GITHUB_ENV
-          echo "VERSION_TAG=${{ env.VERSION_TAG }}"
-          # For later use, strip the “v” so we can form a changelog anchor (e.g. 1.2.3 → 123)
-          short_ver=$(echo "${{ env.VERSION_TAG }}" | sed 's/^v//' | sed 's/\.//g')
+          # 1) ask Node for the raw version string (e.g. “1.2.3”)
+          version=$(node -p "require('./package.json').version")
+      
+          # 2) export VERSION_TAG=v<that version>
+          echo "VERSION_TAG=v${version}" >> $GITHUB_ENV
+      
+          # 3) compute a changelog anchor (strip dots, e.g. 1.2.3 → 123)
+          short_ver=$(echo "${version}" | sed 's/\.//g')
           echo "CHANGELOG_ANCHOR=${short_ver}" >> $GITHUB_ENV
+      
+          # (optional) print them back for debugging
+          echo "VERSION_TAG is now: $VERSION_TAG"
+          echo "CHANGELOG_ANCHOR is now: $CHANGELOG_ANCHOR"
+      
 
       # 2) Check if that exact tag already exists
       - name: Check for existing tag
