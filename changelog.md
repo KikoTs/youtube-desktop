@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
-#### 3.9.0
+#### [v3.9.0](https://github.com/KikoTs/youtube-desktop/compare/v3.8.0...v3.9.0)
 
 - fix(deps): update dependency ts-morph to v26 [`#3409`](https://github.com/KikoTs/youtube-desktop/pull/3409)
 - fix(deps): update dependency @ghostery/adblocker-electron-preload to v2.6.1 [`#3407`](https://github.com/KikoTs/youtube-desktop/pull/3407)
@@ -115,6 +115,17 @@ All notable changes to this project will be documented in this file. Dates are d
 - chore(deps): update dependency eslint-import-resolver-typescript to v4.2.5 [`#3144`](https://github.com/KikoTs/youtube-desktop/pull/3144)
 - chore(deps): update dependency @types/semver to v7.7.0 [`#3141`](https://github.com/KikoTs/youtube-desktop/pull/3141)
 - fix(deps): update dependency electron-updater to v6.6.2 [`#3142`](https://github.com/KikoTs/youtube-desktop/pull/3142)
+- fix(youtube-music): fix #3296, and macOS traffic lights [`#3296`](https://github.com/KikoTs/youtube-desktop/issues/3296)
+- fix: rollback electron version to v34 (for fix #3216) [`#3216`](https://github.com/KikoTs/youtube-desktop/issues/3216)
+- fix(synced-lyrics): fix #3157 [`#3157`](https://github.com/KikoTs/youtube-desktop/issues/3157)
+- Update changelog for v3.9.0 [`01470ba`](https://github.com/KikoTs/youtube-desktop/commit/01470ba9a16cc3cab9356e89d06971b6c916f016)
+- feat(performance-improvement): added "performance improvement" plugin [`1c76415`](https://github.com/KikoTs/youtube-desktop/commit/1c764158461da414cea8bf34c3b514f1f98d7adf)
+- Now atleast it build and loads plugins, stopped extensions! [`b601389`](https://github.com/KikoTs/youtube-desktop/commit/b601389f9ed679d2fbdb88cc48c388f5c46cccc5)
+
+#### v3.8.0
+
+> 26 March 2025
+
 - chore(deps): update dependency typescript-eslint to v8.28.0 [`#3128`](https://github.com/KikoTs/youtube-desktop/pull/3128)
 - chore(deps): update dependency eslint-plugin-prettier to v5.2.5 [`#3123`](https://github.com/KikoTs/youtube-desktop/pull/3123)
 - fix(deps): update dependency @hono/node-server to v1.14.0 [`#3131`](https://github.com/KikoTs/youtube-desktop/pull/3131)
@@ -1237,9 +1248,6 @@ All notable changes to this project will be documented in this file. Dates are d
 - Bump lodash.mergewith from 4.6.1 to 4.6.2 [`#4`](https://github.com/KikoTs/youtube-desktop/pull/4)
 - Bump lodash from 4.17.11 to 4.17.14 [`#5`](https://github.com/KikoTs/youtube-desktop/pull/5)
 - Bump fstream from 1.0.11 to 1.0.12 [`#3`](https://github.com/KikoTs/youtube-desktop/pull/3)
-- fix(youtube-music): fix #3296, and macOS traffic lights [`#3296`](https://github.com/KikoTs/youtube-desktop/issues/3296)
-- fix: rollback electron version to v34 (for fix #3216) [`#3216`](https://github.com/KikoTs/youtube-desktop/issues/3216)
-- fix(synced-lyrics): fix #3157 [`#3157`](https://github.com/KikoTs/youtube-desktop/issues/3157)
 - fix(downloader): apply poToken [`#2863`](https://github.com/KikoTs/youtube-desktop/issues/2863) [`#2780`](https://github.com/KikoTs/youtube-desktop/issues/2780)
 - fix(downloader): fix #2234 [`#2234`](https://github.com/KikoTs/youtube-desktop/issues/2234)
 - fix(downloader): fix #2769 [`#2769`](https://github.com/KikoTs/youtube-desktop/issues/2769)
@@ -1350,6 +1358,6 @@ All notable changes to this project will be documented in this file. Dates are d
 - Fix https://github.com/th-ch/youtube-music/pull/578#issuecomment-1035517531 [`#578`](https://github.com/th-ch/youtube-music/pull/578)
 - fix #490 [`#490`](https://github.com/KikoTs/youtube-desktop/issues/490)
 - fix #472 [`#472`](https://github.com/KikoTs/youtube-desktop/issues/472)
-- Removed Youtube Music Specific Plugins and Added Extension Plugin for additional extensions (UBlock Origin, SponsorBlock, DeArrow) [`60bed2a`](https://github.com/KikoTs/youtube-desktop/commit/60bed2a8b5a1a3bf211fe1e01256370cfb5b230c)
-- Update changelog for v3.9.0 [`01470ba`](https://github.com/KikoTs/youtube-desktop/commit/01470ba9a16cc3cab9356e89d06971b6c916f016)
-- Now atleast it build and loads plugins, stopped extensions! [`b601389`](https://github.com/KikoTs/youtube-desktop/commit/b601389f9ed679d2fbdb88cc48c388f5c46cccc5)
+- feat: run prettier [`a3104fd`](https://github.com/KikoTs/youtube-desktop/commit/a3104fda4b0d58b076d0c737111636a66e468acc)
+- Translated using Weblate (Korean) [`b4b7ad8`](https://github.com/KikoTs/youtube-desktop/commit/b4b7ad824b8c489ae483eba139b46e5b200231fc)
+- Translated using Weblate (English) [`d2eabaa`](https://github.com/KikoTs/youtube-desktop/commit/d2eabaa4bbccd89eae529eae52cec035e8e2620c)
