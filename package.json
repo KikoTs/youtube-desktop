@@ -2,7 +2,7 @@
   "name": "youtube-desktop",
   "productName": "YouTube",
   "desktopName": "com.github.kikots.youtube",
-  "version": "3.9.0",
+  "version": "4.0.0",
   "description": "YouTube Desktop App - including custom plugins",
   "main": "./dist/main/index.js",
   "license": "MIT",
