@@ -1,0 +1,22 @@
+body.gesture-tracking {
+  transition: none;
+  will-change: transform;
+}
+
+body.gesture-slide-cancel,
+body.gesture-slide-forward,
+body.gesture-slide-back {
+  transition: transform 0.3s ease-in-out;
+}
+
+body.gesture-slide-cancel {
+  transform: translateX(0);
+}
+
+body.gesture-slide-forward {
+  transform: translateX(-100%);
+}
+
+body.gesture-slide-back {
+  transform: translateX(100%);
+}
